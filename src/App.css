@@ -1,41 +1,48 @@
-/* Centering container with left/right space */
 .container {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   padding: 20px;
-  justify-content: center; /* Centers boxes horizontally */
-  align-items: center; /* Centers boxes vertically */
-  min-height: 100vh; /* Makes sure it's centered in the viewport */
-  max-width: 800px; /* Prevents it from stretching too far */
-  margin: 0 auto; /* Centers the whole container */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-/* Style for each box */
+/* Box styles */
 .box {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   background: #f2f2f2;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
+  cursor: grab;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
-/* Add box button */
+/* Add Box Button */
 .add-box {
-  background: #d9edf7;
-  color: #31708f;
+  background: #4caf50;
+  color: white;
   font-size: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-/* Modal overlay style */
+.add-box:hover {
+  background: #45a049;
+}
+
+/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -48,14 +55,27 @@
   justify-content: center;
 }
 
-/* Modal style */
+/* Modal box */
 .modal {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   width: 300px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
 .form-group {
   margin-bottom: 10px;
 }

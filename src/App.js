@@ -1,14 +1,17 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
+import DetailPage from "./DetailPage";
 
-const Box = ({ name, number, onDragStart, onDrop, onDragOver }) => {
+const Box = ({ name, number, onDragStart, onDrop, onClick }) => {
     return (
         <div
             className="box"
             draggable
-            onDragStart={() => onDragStart(name, number)}
-            onDrop={() => onDrop(name, number)}
+            onDragStart={(e) => onDragStart(e, name, number)}
             onDragOver={(e) => e.preventDefault()} // Allows dropping
+            onDrop={(e) => onDrop(e, name, number)}
+            onClick={() => onClick(name, number)}
         >
             <div className="box-name">{name}</div>
             <div className="box-number">{number}</div>
@@ -16,115 +19,66 @@ const Box = ({ name, number, onDragStart, onDrop, onDragOver }) => {
     );
 };
 
-const TransferModal = ({ fromBox, toBox, onClose, onTransfer }) => {
-    const [transferAmount, setTransferAmount] = useState("");
-
-    const handleTransfer = () => {
-        const amount = parseFloat(transferAmount);
-        if (!isNaN(amount) && amount > 0 && amount <= fromBox.number) {
-            onTransfer(amount);
-        }
-    };
-
-    return (
-        <div className="modal-overlay">
-            <div className="modal">
-                <h2>Transfer Amount</h2>
-                <p>
-                    Moving from <b>{fromBox.name}</b> ({fromBox.number}) to{" "}
-                    <b>{toBox.name}</b> ({toBox.number})
-                </p>
-                <input
-                    type="number"
-                    value={transferAmount}
-                    onChange={(e) => setTransferAmount(e.target.value)}
-                    placeholder="Enter amount"
-                />
-                <div className="modal-buttons">
-                    <button onClick={handleTransfer}>Save</button>
-                    <button onClick={onClose}>Cancel</button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const AddBoxModal = ({ onClose, onSave }) => {
-    const [name, setName] = useState("");
-    const [number, setNumber] = useState("");
-
-    const handleSave = () => {
-        if (name && !isNaN(number) && number !== "") {
-            onSave(name, parseFloat(number));
-        }
-    };
-
-    return (
-        <div className="modal-overlay">
-            <div className="modal">
-                <h2>Add New Box</h2>
-                <input
-                    type="text"
-                    placeholder="Box Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-                <input
-                    type="number"
-                    placeholder="Starting Number"
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
-                />
-                <div className="modal-buttons">
-                    <button onClick={handleSave}>Add</button>
-                    <button onClick={onClose}>Cancel</button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const App = () => {
+const AppContent = () => {
     const [boxes, setBoxes] = useState([
         { name: "Box A", number: 100 },
         { name: "Box B", number: 50 },
     ]);
-    const [showTransferModal, setShowTransferModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [newBox, setNewBox] = useState({ name: "", number: "" });
     const [draggedBox, setDraggedBox] = useState(null);
-    const [dropTarget, setDropTarget] = useState(null);
+    const [transferPopup, setTransferPopup] = useState(null);
+    const [transferAmount, setTransferAmount] = useState("");
+    const navigate = useNavigate();
 
-    const handleDragStart = (name, number) => {
+    const handleDragStart = (e, name, number) => {
         setDraggedBox({ name, number });
     };
 
-    const handleDrop = (name, number) => {
-        if (draggedBox && draggedBox.name !== name) {
-            setDropTarget({ name, number });
-            setShowTransferModal(true);
+    const handleDrop = (e, targetName, targetNumber) => {
+        if (draggedBox && draggedBox.name !== targetName) {
+            setTransferPopup({ from: draggedBox, to: { name: targetName, number: targetNumber } });
+            setDraggedBox(null);
         }
     };
 
-    const handleTransfer = (amount) => {
-        setBoxes((prevBoxes) =>
-            prevBoxes.map((box) => {
-                if (box.name === draggedBox.name) return { ...box, number: box.number - amount };
-                if (box.name === dropTarget.name) return { ...box, number: box.number + amount };
-                return box;
-            })
-        );
-        setShowTransferModal(false);
+    const handleTransfer = () => {
+        const amount = parseInt(transferAmount);
+        if (!isNaN(amount) && transferPopup) {
+            setBoxes((prevBoxes) =>
+                prevBoxes.map((box) => {
+                    if (box.name === transferPopup.from.name) {
+                        return { ...box, number: Math.max(0, box.number - amount) }; // Subtract from source
+                    }
+                    if (box.name === transferPopup.to.name) {
+                        return { ...box, number: box.number + amount }; // Add to target
+                    }
+                    return box;
+                })
+            );
+            setTransferPopup(null);
+            setTransferAmount("");
+        }
     };
 
-    const handleAddBox = (name, number) => {
-        setBoxes([...boxes, { name, number }]);
-        setShowAddModal(false);
+    const handleAddBox = () => {
+        if (newBox.name && newBox.number) {
+            setBoxes([...boxes, { ...newBox }]);
+            setNewBox({ name: "", number: "" });
+            setShowAddModal(false);
+        }
     };
 
     return (
         <div className="container">
             {boxes.map((box) => (
-                <Box key={box.name} {...box} onDragStart={handleDragStart} onDrop={handleDrop} />
+                <Box
+                    key={box.name}
+                    {...box}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                    onClick={() => navigate("/detail", { state: { box } })}
+                />
             ))}
 
             {/* Add Box Button */}
@@ -132,18 +86,64 @@ const App = () => {
                 <span>+</span>
             </div>
 
-            {showTransferModal && draggedBox && dropTarget && (
-                <TransferModal
-                    fromBox={draggedBox}
-                    toBox={dropTarget}
-                    onTransfer={handleTransfer}
-                    onClose={() => setShowTransferModal(false)}
-                />
+            {/* Add Box Modal */}
+            {showAddModal && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3>Add New Box</h3>
+                        <input
+                            type="text"
+                            placeholder="Name"
+                            value={newBox.name}
+                            onChange={(e) => setNewBox({ ...newBox, name: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Number"
+                            value={newBox.number}
+                            onChange={(e) => setNewBox({ ...newBox, number: parseInt(e.target.value) || "" })}
+                        />
+                        <div className="modal-buttons">
+                            <button onClick={handleAddBox}>Save</button>
+                            <button onClick={() => setShowAddModal(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
             )}
 
-            {showAddModal && <AddBoxModal onSave={handleAddBox} onClose={() => setShowAddModal(false)} />}
+            {/* Transfer Modal */}
+            {transferPopup && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3>Transfer Amount</h3>
+                        <p>
+                            <strong>{transferPopup.from.name} ({transferPopup.from.number})</strong> →
+                            <strong> {transferPopup.to.name} ({transferPopup.to.number})</strong>
+                        </p>
+                        <input
+                            type="number"
+                            placeholder="Amount"
+                            value={transferAmount}
+                            onChange={(e) => setTransferAmount(e.target.value)}
+                        />
+                        <div className="modal-buttons">
+                            <button onClick={handleTransfer}>Confirm</button>
+                            <button onClick={() => setTransferPopup(null)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
+const App = () => (
+    <Router>
+        <Routes>
+            <Route path="/" element={<AppContent />} />
+            <Route path="/detail" element={<DetailPage />} />
+        </Routes>
+    </Router>
+);
 
 export default App;

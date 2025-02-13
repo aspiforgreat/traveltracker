@@ -82,12 +82,12 @@ const DetailPage = () => {
                         disabled={handles.length >= maxHandles}
                         sx={{ ml: 2 }}
                     >
-                        Add Handle
+                        Add Budget
                     </Button>
                 </MuiBox>
                 <MuiBox sx={{ mt: 2 }}>
                     <Typography variant="subtitle1">
-                        Regions (Value based on Budget):
+                        Budgets (Value based on Budget):
                     </Typography>
                     <Grid container spacing={1}>
                         {computedRegions.map((region, index) => {

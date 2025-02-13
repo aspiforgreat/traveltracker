@@ -12,7 +12,7 @@ const DetailPage = () => {
             <button className="back-button" onClick={() => navigate("/")}>← Back</button>
             <div className="box-info">
                 <h2>{box?.name}</h2>
-                <p>Number: {box?.number}</p>
+                <p>Budget: {box?.number}</p>
             </div>
         </div>
     );

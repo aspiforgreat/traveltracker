@@ -34,7 +34,7 @@ const TotalDisplay = ({ boxes }) => {
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
             {/* User Total Button */}
             <Box>
-                <Typography variant="h6">User Total: </Typography>
+                <Typography variant="h6"> Total Budget: </Typography>
                 <Button onClick={handleEditClick} sx={{ fontSize: "1.5rem", textTransform: "none" }}>
                     {userTotal}
                 </Button>
@@ -42,7 +42,7 @@ const TotalDisplay = ({ boxes }) => {
 
             {/* Total Sum of Boxes */}
             <Box>
-                <Typography variant="h6">Total from Boxes: </Typography>
+                <Typography variant="h6">Total allocated: </Typography>
                 <Typography variant="h5" color="primary">{totalBoxSum}</Typography>
             </Box>
 

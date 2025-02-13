@@ -1,12 +1,11 @@
 .container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
   gap: 16px;
   padding: 20px;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  max-width: 800px;
+  max-width: 600px; /* Limits row width */
   margin: 0 auto;
 }
 
@@ -26,7 +25,7 @@
   font-size: 1.2rem;
 }
 
-/* Add Box Button */
+/* Add Box Button (same size as other boxes) */
 .add-box {
   background: #4caf50;
   color: white;

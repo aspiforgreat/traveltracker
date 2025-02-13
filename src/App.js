@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import DetailPage from "./DetailPage";
+import AddBoxForm from "./AddBoxForm"; // ✅ Import the separate form component
 
 const Box = ({ name, number, onDragStart, onDrop, onClick }) => {
     return (
@@ -25,7 +26,6 @@ const AppContent = () => {
         { name: "Box B", number: 50 },
     ]);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [newBox, setNewBox] = useState({ name: "", number: "" });
     const [draggedBox, setDraggedBox] = useState(null);
     const [transferPopup, setTransferPopup] = useState(null);
     const [transferAmount, setTransferAmount] = useState("");
@@ -61,12 +61,9 @@ const AppContent = () => {
         }
     };
 
-    const handleAddBox = () => {
-        if (newBox.name && newBox.number) {
-            setBoxes([...boxes, { ...newBox }]);
-            setNewBox({ name: "", number: "" });
-            setShowAddModal(false);
-        }
+    const handleAddBox = (name, number) => {
+        setBoxes([...boxes, { name, number }]);
+        setShowAddModal(false);
     };
 
     return (
@@ -86,28 +83,10 @@ const AppContent = () => {
                 <span>+</span>
             </div>
 
-            {/* Add Box Modal */}
+            {/* Add Box Modal - Now Using Separate Component */}
             {showAddModal && (
                 <div className="modal-overlay">
-                    <div className="modal">
-                        <h3>Add New Box</h3>
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            value={newBox.name}
-                            onChange={(e) => setNewBox({ ...newBox, name: e.target.value })}
-                        />
-                        <input
-                            type="number"
-                            placeholder="Number"
-                            value={newBox.number}
-                            onChange={(e) => setNewBox({ ...newBox, number: parseInt(e.target.value) || "" })}
-                        />
-                        <div className="modal-buttons">
-                            <button onClick={handleAddBox}>Save</button>
-                            <button onClick={() => setShowAddModal(false)}>Cancel</button>
-                        </div>
-                    </div>
+                    <AddBoxForm onClose={() => setShowAddModal(false)} onSave={handleAddBox} />
                 </div>
             )}
 

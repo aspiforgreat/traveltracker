@@ -1,22 +1,30 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
-import "./App.css";
+import { Box, Button, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
 import DetailPage from "./DetailPage";
-import AddBoxForm from "./AddBoxForm"; // ✅ Import the separate form component
+import AddBoxForm from "./AddBoxForm";
 
-const Box = ({ name, number, onDragStart, onDrop, onClick }) => {
+const DraggableBox = ({ name, number, onDragStart, onDrop, onClick }) => {
     return (
-        <div
-            className="box"
+        <Paper
+            elevation={3}
+            sx={{
+                padding: 2,
+                borderRadius: 2,
+                textAlign: "center",
+                cursor: "pointer",
+                backgroundColor: "#fff",
+                "&:hover": { backgroundColor: "#f0f0f0" },
+            }}
             draggable
             onDragStart={(e) => onDragStart(e, name, number)}
-            onDragOver={(e) => e.preventDefault()} // Allows dropping
+            onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => onDrop(e, name, number)}
             onClick={() => onClick(name, number)}
         >
-            <div className="box-name">{name}</div>
-            <div className="box-number">{number}</div>
-        </div>
+            <Typography variant="h6">{name}</Typography>
+            <Typography variant="subtitle1" color="primary">{number}</Typography>
+        </Paper>
     );
 };
 
@@ -48,10 +56,10 @@ const AppContent = () => {
             setBoxes((prevBoxes) =>
                 prevBoxes.map((box) => {
                     if (box.name === transferPopup.from.name) {
-                        return { ...box, number: Math.max(0, box.number - amount) }; // Subtract from source
+                        return { ...box, number: Math.max(0, box.number - amount) };
                     }
                     if (box.name === transferPopup.to.name) {
-                        return { ...box, number: box.number + amount }; // Add to target
+                        return { ...box, number: box.number + amount };
                     }
                     return box;
                 })
@@ -67,52 +75,62 @@ const AppContent = () => {
     };
 
     return (
-        <div className="container">
-            {boxes.map((box) => (
-                <Box
-                    key={box.name}
-                    {...box}
-                    onDragStart={handleDragStart}
-                    onDrop={handleDrop}
-                    onClick={() => navigate("/detail", { state: { box } })}
-                />
-            ))}
+        <Container sx={{ mt: 5 }}>
+            <Grid container spacing={2} justifyContent="center">
+                {boxes.map((box) => (
+                    <Grid item xs={12} sm={4} md={3} key={box.name}>
+                        <DraggableBox
+                            {...box}
+                            onDragStart={handleDragStart}
+                            onDrop={handleDrop}
+                            onClick={() => navigate("/detail", { state: { box } })}
+                        />
+                    </Grid>
+                ))}
 
-            {/* Add Box Button */}
-            <div className="box add-box" onClick={() => setShowAddModal(true)}>
-                <span>+</span>
-            </div>
+                {/* Add New Box Button */}
+                <Grid item xs={12} sm={4} md={3}>
+                    <Button
+                        variant="contained"
+                        sx={{ width: "100%", height: "100%", borderRadius: 2 }}
+                        onClick={() => setShowAddModal(true)}
+                    >
+                        +
+                    </Button>
+                </Grid>
+            </Grid>
 
-            {/* Add Box Modal - Now Using Separate Component */}
-            {showAddModal && (
-                <div className="modal-overlay">
+            {/* Add Box Modal */}
+            <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
                     <AddBoxForm onClose={() => setShowAddModal(false)} onSave={handleAddBox} />
-                </div>
-            )}
+                </Box>
+            </Modal>
 
             {/* Transfer Modal */}
-            {transferPopup && (
-                <div className="modal-overlay">
-                    <div className="modal">
-                        <h3>Transfer Amount</h3>
-                        <p>
-                            <strong>{transferPopup.from.name} ({transferPopup.from.number})</strong> →
-                            <strong> {transferPopup.to.name} ({transferPopup.to.number})</strong>
-                        </p>
-                        <input
-                            type="number"
-                            placeholder="Amount"
-                            value={transferAmount}
-                            onChange={(e) => setTransferAmount(e.target.value)}
-                        />
-                        <div className="modal-buttons">
-                            <button onClick={handleTransfer}>Confirm</button>
-                            <button onClick={() => setTransferPopup(null)}>Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+            <Modal open={Boolean(transferPopup)} onClose={() => setTransferPopup(null)}>
+                <Box sx={{ p: 4, bgcolor: "white", borderRadius: 2, mx: "auto", mt: 10, width: 300, textAlign: "center" }}>
+                    <Typography variant="h6">Transfer Amount</Typography>
+                    <Typography>
+                        <strong>{transferPopup?.from.name} ({transferPopup?.from.number})</strong> →
+                        <strong> {transferPopup?.to.name} ({transferPopup?.to.number})</strong>
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        label="Amount"
+                        type="number"
+                        variant="outlined"
+                        sx={{ mt: 2 }}
+                        value={transferAmount}
+                        onChange={(e) => setTransferAmount(e.target.value)}
+                    />
+                    <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+                        <Button variant="contained" onClick={handleTransfer}>Confirm</Button>
+                        <Button variant="outlined" onClick={() => setTransferPopup(null)}>Cancel</Button>
+                    </Box>
+                </Box>
+            </Modal>
+        </Container>
     );
 };
 

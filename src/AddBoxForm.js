@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Box, Button, TextField, Paper, Typography } from "@mui/material";
 
 const AddBoxForm = ({ onClose, onSave }) => {
     const [name, setName] = useState("");
@@ -14,40 +15,32 @@ const AddBoxForm = ({ onClose, onSave }) => {
     };
 
     return (
-        <div className="modal">
-            <h2 className="text-xl font-bold mb-4 text-center">Add a New Box</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                    type="text"
-                    placeholder="Name"
+        <Paper sx={{ p: 4, width: 300, textAlign: "center", borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>Add a New Box</Typography>
+            <form onSubmit={handleSubmit}>
+                <TextField
+                    fullWidth
+                    label="Name"
+                    variant="outlined"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    sx={{ mb: 2 }}
                 />
-                <input
+                <TextField
+                    fullWidth
+                    label="Number"
                     type="number"
-                    placeholder="Number"
+                    variant="outlined"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    sx={{ mb: 2 }}
                 />
-                <div className="flex justify-between">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                    >
-                        Save
-                    </button>
-                </div>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+                    <Button variant="outlined" onClick={onClose}>Cancel</Button>
+                    <Button variant="contained" type="submit">Save</Button>
+                </Box>
             </form>
-        </div>
+        </Paper>
     );
 };
 

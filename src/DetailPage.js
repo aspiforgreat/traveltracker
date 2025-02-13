@@ -1,104 +1,101 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-    Box,
-    Button,
-    Slider,
-    Typography,
-    Grid,
-    Container,
-    TextField,
-    Modal,
-} from "@mui/material";
+import { Box, Button, Typography, Container, Slider, TextField, Modal } from "@mui/material";
 import "./DetailPage.css";
+
+const getRandomColor = (existingColors) => {
+    const colors = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff", "#a0c4ff", "#bdb2ff", "#ffc6ff"];
+    let newColor;
+    do {
+        newColor = colors[Math.floor(Math.random() * colors.length)];
+    } while (existingColors.includes(newColor));
+    return newColor;
+};
 
 const DetailPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const box = location.state?.box; // Get the box data
+    const box = location.state?.box;
 
-    const [handles, setHandles] = useState([]); // positions (0-100)
+    const [handles, setHandles] = useState([]);
+    const [regionNames, setRegionNames] = useState([""]);
+    const [regionColors, setRegionColors] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [defaultRegionName, setDefaultRegionName] = useState("");
+    const [newRegionName, setNewRegionName] = useState("");
+    const [namingType, setNamingType] = useState("both");
     const maxHandles = 5;
-    const [regionNames, setRegionNames] = useState([""]); // First region initially unnamed
 
-    // Modal state for naming regions
-    const [regionNameModalOpen, setRegionNameModalOpen] = useState(false);
-    const [defaultRegionName, setDefaultRegionName] = useState(""); // For first-time naming
-    const [newRegionName, setNewRegionName] = useState(""); // For the new region
-    const [namingType, setNamingType] = useState("");
-
-    // Function to add a handle
-    const addHandle = () => {
-        if (handles.length < maxHandles) {
-            let newHandle = handles.length === 0 ? 50 : Math.min(handles[handles.length - 1] + 10, 100);
-            setHandles([...handles, newHandle].sort((a, b) => a - b));
-        }
-    };
-
-    // Handle slider movement
     const handleSliderChange = (event, newValue) => {
         if (Array.isArray(newValue)) {
             setHandles([...newValue].sort((a, b) => a - b));
         }
     };
 
-    // Compute region sizes
-    let computedRegions = [];
-    if (handles.length > 0) {
-        computedRegions.push(handles[0]); // First region
-        for (let i = 1; i < handles.length; i++) {
-            computedRegions.push(handles[i] - handles[i - 1]);
+    const addHandle = () => {
+        if (handles.length < maxHandles) {
+            let newHandle = handles.length === 0 ? 50 : Math.min(handles[handles.length - 1] + 10, 100);
+            setHandles([...handles, newHandle].sort((a, b) => a - b));
+            setRegionColors([...regionColors, getRandomColor(regionColors)]);
+            setModalOpen(true);
         }
-        computedRegions.push(100 - handles[handles.length - 1]); // Remaining region
-    } else {
-        computedRegions.push(100);
-    }
-
-    // Handle button click to add a new region
-    const handleAddHandleClick = () => {
-        if (!regionNames[0] || regionNames[0].trim() === "") {
-            setNamingType("both"); // Name both default and new region
-        } else {
-            setNamingType("new"); // Name only the new region
-        }
-        setRegionNameModalOpen(true);
     };
 
-    // Handle submitting the region names
     const handleRegionNameSubmit = () => {
         if (namingType === "both") {
-            // Update the default region name and add a new one
             setRegionNames([defaultRegionName, newRegionName]);
-            addHandle();
-        } else if (namingType === "new") {
-            // Only add the new region name
-            setRegionNames((prev) => [...prev, newRegionName]);
-            addHandle();
+        } else {
+            setRegionNames([...regionNames, newRegionName]);
         }
-
-        // Reset modal state
         setDefaultRegionName("");
         setNewRegionName("");
-        setNamingType("");
-        setRegionNameModalOpen(false);
+        setNamingType("new");
+        setModalOpen(false);
     };
+
+    let computedRegions = handles.length > 0
+        ? [handles[0], ...handles.slice(1).map((h, i) => h - handles[i]), 100 - handles[handles.length - 1]]
+        : [100];
 
     return (
         <div className="detail-page">
-            <button className="back-button" onClick={() => navigate("/")}>
-                ← Back
-            </button>
+            <button className="back-button" onClick={() => navigate("/")}>← Back</button>
             <div className="box-info">
                 <h2>{box?.name}</h2>
                 <p>Budget: {box?.number}</p>
             </div>
 
-            {/* Slider Section */}
             <Container sx={{ mt: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                    Multi-Handle Slider
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                <Typography variant="h6" gutterBottom>Budget Allocation</Typography>
+                <Box sx={{ width: "100%", mt: 2, position: "relative", height: "50px" }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            width: "100%",
+                            height: "50px",
+                            borderRadius: "10px",
+                            overflow: "hidden"
+                        }}>
+                        {computedRegions.map((region, index) => (
+                            <Box
+                                key={index}
+                                sx={{
+                                    flex: region,
+                                    backgroundColor: regionColors[index] || getRandomColor(regionColors), // Always colorful
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "#000",
+                                    fontWeight: "bold",
+                                    padding: "4px",
+                                    borderRight: index < computedRegions.length - 1 ? "2px solid white" : "none"
+                                }}
+                            >
+                                {regionNames[index] || "Unnamed"}: {Math.round((region / 100) * (box?.number || 0))}
+                            </Box>
+                        ))}
+
+                    </Box>
                     <Slider
                         value={handles}
                         onChange={handleSliderChange}
@@ -106,90 +103,65 @@ const DetailPage = () => {
                         min={0}
                         max={100}
                         step={1}
-                        disableSwap
-                        sx={{ flexGrow: 1 }}
+                        sx={{
+                            position: "absolute",
+                            top: 0,
+                            width: "100%",
+                            height: "100%", // Full height of the box
+                            '& .MuiSlider-thumb': {
+                                width: 8,  // Slightly wider for better grip
+                                height: "50px", // Matches box height
+                                backgroundColor: "#ccc", // Light grey color
+                                borderRadius: "4px",
+                                position: "absolute",
+                                top: 0,
+                                bottom: 0,
+                                transform: "none",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            },
+                            '& .MuiSlider-track': {
+                                display: "none",
+                            },
+                            '& .MuiSlider-rail': {
+                                display: "none",
+                            },
+                        }}
                     />
-                    <Button
-                        variant="contained"
-                        onClick={handleAddHandleClick}
-                        disabled={handles.length >= maxHandles}
-                        sx={{ ml: 2 }}
-                    >
+
+
+                    <Button variant="contained" onClick={addHandle} disabled={handles.length >= maxHandles} sx={{ mt: 2 }}>
                         Add Budget
                     </Button>
-                </Box>
-
-                {/* Display Regions */}
-                <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle1">
-                        Budget Categories:
-                    </Typography>
-                    <Grid container spacing={1}>
-                        {computedRegions.map((region, index) => {
-                            const amount = Math.round((region * (box?.number || 0)) / 100);
-                            return (
-                                <Grid item key={index}>
-                                    <Typography variant="body1">
-                                        {index + 1}{" "} :
-                                        {regionNames[index] ? ` ${regionNames[index]}` : ""}: {amount}
-                                    </Typography>
-                                </Grid>
-                            );
-                        })}
-                    </Grid>
                 </Box>
             </Container>
 
             {/* Modal for Naming Regions */}
-            <Modal open={regionNameModalOpen} onClose={() => setRegionNameModalOpen(false)}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                        p: 3,
-                        bgcolor: "white",
-                        borderRadius: 2,
-                        width: 300,
-                        mx: "auto",
-                        mt: "20vh",
-                    }}
-                >
+            <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+                <Box sx={{ p: 3, bgcolor: "white", borderRadius: 2, width: 300, mx: "auto", mt: "20vh" }}>
                     <Typography variant="h6">
-                        {namingType === "both"
-                            ? "Name Default and New Region"
-                            : "Name New Region"}
+                        {namingType === "both" ? "Name Default and New Region" : "Name New Region"}
                     </Typography>
-
                     {namingType === "both" && (
                         <TextField
                             label="Default Region Name"
                             value={defaultRegionName}
                             onChange={(e) => setDefaultRegionName(e.target.value)}
+                            fullWidth
+                            sx={{ mt: 2 }}
                         />
                     )}
-
                     <TextField
                         label="New Region Name"
                         value={newRegionName}
                         onChange={(e) => setNewRegionName(e.target.value)}
+                        fullWidth
+                        sx={{ mt: 2 }}
                     />
-
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-                        <Button
-                            variant="outlined"
-                            onClick={() => {
-                                setRegionNameModalOpen(false);
-                                setDefaultRegionName("");
-                                setNewRegionName("");
-                                setNamingType("");
-                            }}
-                        >
-                            Cancel
-                        </Button>
-                        <Button variant="contained" onClick={handleRegionNameSubmit}>
-                            Save
-                        </Button>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 2 }}>
+                        <Button variant="outlined" onClick={() => setModalOpen(false)}>Cancel</Button>
+                        <Button variant="contained" onClick={handleRegionNameSubmit}>Save</Button>
                     </Box>
                 </Box>
             </Modal>

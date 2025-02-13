@@ -54,13 +54,15 @@ const AppContent = () => {
     const handleTransfer = () => {
         const amount = parseInt(transferAmount);
         if (!isNaN(amount) && transferPopup) {
+            const maxTransferAmount = Math.min(transferPopup.from.number, amount); // Limit transfer to available amount in the source box
+
             setBoxes((prevBoxes) =>
                 prevBoxes.map((box) => {
                     if (box.name === transferPopup.from.name) {
-                        return { ...box, number: Math.max(0, box.number - amount) };
+                        return { ...box, number: Math.max(0, box.number - maxTransferAmount) }; // Subtract from source, no less than 0
                     }
                     if (box.name === transferPopup.to.name) {
-                        return { ...box, number: box.number + amount };
+                        return { ...box, number: box.number + maxTransferAmount }; // Add to target
                     }
                     return box;
                 })
@@ -69,6 +71,7 @@ const AppContent = () => {
             setTransferAmount("");
         }
     };
+
 
     const handleAddBox = (name, number) => {
         setBoxes([...boxes, { name, number }]);

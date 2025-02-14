@@ -81,7 +81,7 @@ const DetailPage = () => {
                                 key={index}
                                 sx={{
                                     flex: region,
-                                    backgroundColor: regionColors[index] || getRandomColor(regionColors), // Always colorful
+                                    backgroundColor: index === computedRegions.length - 1 ? "lightgray" : regionColors[index] || getRandomColor(regionColors),
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
@@ -94,6 +94,7 @@ const DetailPage = () => {
                                 {regionNames[index] || "Unnamed"}: {Math.round((region / 100) * (box?.number || 0))}
                             </Box>
                         ))}
+
 
                     </Box>
                     <Slider

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Typography, Container, Slider, TextField, Modal } from "@mui/material";
 import "./DetailPage.css";
@@ -16,15 +16,32 @@ const DetailPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const box = location.state?.box;
+    const baseUrl = "http://localhost:8000";
 
-    const [handles, setHandles] = useState([]);
-    const [regionNames, setRegionNames] = useState([""]);
-    const [regionColors, setRegionColors] = useState([]);
+    // Initialize slider and region states from the box if present; otherwise use defaults.
+    const [handles, setHandles] = useState(box?.handles || []);
+    const [regionNames, setRegionNames] = useState(box?.regionNames || [""]);
+    const [regionColors, setRegionColors] = useState(box?.regionColors || []);
     const [modalOpen, setModalOpen] = useState(false);
     const [defaultRegionName, setDefaultRegionName] = useState("");
     const [newRegionName, setNewRegionName] = useState("");
     const [namingType, setNamingType] = useState("both");
     const maxHandles = 5;
+
+    // Whenever handles, regionNames, or regionColors change, update the box in the backend.
+    useEffect(() => {
+        if (box?._id) {
+            const updatedFields = { handles, regionNames, regionColors };
+            fetch(`${baseUrl}/api/boxes/${box._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedFields)
+            })
+                .then(res => res.json())
+                .then(data => console.log("Box updated:", data))
+                .catch(err => console.error("Error updating box:", err));
+        }
+    }, [handles, regionNames, regionColors, box, baseUrl]);
 
     const handleSliderChange = (event, newValue) => {
         if (Array.isArray(newValue)) {
@@ -75,7 +92,8 @@ const DetailPage = () => {
                             height: "50px",
                             borderRadius: "10px",
                             overflow: "hidden"
-                        }}>
+                        }}
+                    >
                         {computedRegions.map((region, index) => (
                             <Box
                                 key={index}
@@ -94,8 +112,6 @@ const DetailPage = () => {
                                 {regionNames[index] || "Unnamed"}: {Math.round((region / 100) * (box?.number || 0))}
                             </Box>
                         ))}
-
-
                     </Box>
                     <Slider
                         value={handles}
@@ -108,11 +124,11 @@ const DetailPage = () => {
                             position: "absolute",
                             top: 0,
                             width: "100%",
-                            height: "100%", // Full height of the box
+                            height: "100%",
                             '& .MuiSlider-thumb': {
-                                width: 8,  // Slightly wider for better grip
-                                height: "50px", // Matches box height
-                                backgroundColor: "#ccc", // Light grey color
+                                width: 8,
+                                height: "50px",
+                                backgroundColor: "#ccc",
                                 borderRadius: "4px",
                                 position: "absolute",
                                 top: 0,
@@ -122,23 +138,16 @@ const DetailPage = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                             },
-                            '& .MuiSlider-track': {
-                                display: "none",
-                            },
-                            '& .MuiSlider-rail': {
-                                display: "none",
-                            },
+                            '& .MuiSlider-track': { display: "none" },
+                            '& .MuiSlider-rail': { display: "none" },
                         }}
                     />
-
-
                     <Button variant="contained" onClick={addHandle} disabled={handles.length >= maxHandles} sx={{ mt: 2 }}>
                         Add Budget
                     </Button>
                 </Box>
             </Container>
 
-            {/* Modal for Naming Regions */}
             <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
                 <Box sx={{ p: 3, bgcolor: "white", borderRadius: 2, width: 300, mx: "auto", mt: "20vh" }}>
                     <Typography variant="h6">

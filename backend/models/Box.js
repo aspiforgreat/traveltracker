@@ -3,10 +3,12 @@ import mongoose from "mongoose";
 const BoxSchema = new mongoose.Schema({
     name: { type: String, required: true },
     number: { type: Number, required: true },
-    parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Box", default: null },
     isSubBudgetEnabled: { type: Boolean, default: false },
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Box" }] // New: Store child boxes
+    parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Box", default: null },
+    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Box" }],
+    handles: { type: [Number], default: [] },
+    regionNames: { type: [String], default: [""] },
+    regionColors: { type: [String], default: [] }
 });
 
-const Box = mongoose.model("Box", BoxSchema);
-export default Box;
+export default mongoose.model("Box", BoxSchema);

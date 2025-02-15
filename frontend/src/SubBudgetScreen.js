@@ -1,10 +1,11 @@
-// SubBudgetScreen.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
 import AddBoxForm from "./AddBoxForm";
 import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
+
 
 const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
     return (
@@ -33,25 +34,32 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
 };
 
 const SubBudgetScreen = () => {
+
+    const baseUrl =  "http://localhost:8000";
     const navigate = useNavigate();
     const location = useLocation();
-    // If a parent box is provided, we are in a nested subbudget screen.
     const parentBox = location.state?.box;
-
-    // Use a clean slate for nested subbudgets (start with an empty array)
-    // Otherwise, use default boxes.
-    const [boxes, setBoxes] = useState(
-        parentBox
-            ? []
-            : [
-                { name: "Box A", number: 100, subbudgetEnabled: false },
-                { name: "Box B", number: 50, subbudgetEnabled: false },
-            ]
-    );
+    const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
     const [draggedBox, setDraggedBox] = useState(null);
     const [transferPopup, setTransferPopup] = useState(null);
     const [transferAmount, setTransferAmount] = useState("");
+
+    // Fetch boxes from the backend
+    useEffect(() => {
+        const fetchBoxes = async () => {
+            try {
+                const response = await axios.get(baseUrl + "/api/boxes", {
+                    params: { parentId: parentBox?._id || null },
+                });
+                setBoxes(response.data);
+            } catch (error) {
+                console.error("Error fetching boxes:", error);
+            }
+        };
+
+        fetchBoxes();
+    }, [parentBox]);
 
     const handleDragStart = (e, box) => {
         setDraggedBox(box);
@@ -87,25 +95,27 @@ const SubBudgetScreen = () => {
         }
     };
 
-    const handleAddBox = (name, number, subbudgetEnabled) => {
-        setBoxes([...boxes, { name, number, subbudgetEnabled }]);
-        setShowAddModal(false);
+    const handleAddBox = async (name, number, subbudgetEnabled) => {
+        try {
+            const newBox = { name, number, subbudgetEnabled, parentId: parentBox?._id || null };
+            const response = await axios.post(baseUrl + "/api/boxes", newBox);
+            setBoxes((prevBoxes) => [...prevBoxes, response.data]);
+            setShowAddModal(false);
+        } catch (error) {
+            console.error("Error adding box:", error);
+        }
     };
 
-    // When a box is clicked, check its subbudget flag.
     const handleBoxClick = (box) => {
-        if (box.subbudgetEnabled) {
-            // Navigate to a nested SubBudgetScreen with this box as parent.
+        if (box.isSubBudgetEnabled) {
             navigate("/subbudget", { state: { box } });
         } else {
-            // Navigate to the standard DetailPage.
             navigate("/detail", { state: { box } });
         }
     };
 
     return (
         <Container sx={{ mt: 5 }}>
-            {/* Conditional Back Navigation: Only show when in a nested subbudget */}
             {parentBox && (
                 <Box sx={{ mb: 2 }}>
                     <Button variant="outlined" onClick={() => navigate(-1)}>
@@ -114,32 +124,27 @@ const SubBudgetScreen = () => {
                 </Box>
             )}
 
-            {/* Show parent info if in a nested screen */}
             {parentBox && (
                 <Typography variant="h5" gutterBottom>
                     Subbudget for {parentBox.name} (Total: {parentBox.number})
                 </Typography>
             )}
 
-            {/* Total Display Component */}
             <TotalDisplay boxes={parentBox ? [{ name: parentBox.name, number: parentBox.number }] : boxes} />
 
-            {/* MultiSliderBar for adjusting allocations */}
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} />
 
             <Typography variant="h6" gutterBottom>
                 {parentBox ? "Sub-Boxes" : "Countries"}
             </Typography>
 
-            {/* Grid of Draggable Boxes */}
             <Grid container spacing={2} justifyContent="center">
                 {boxes.map((box) => (
-                    <Grid item xs={12} sm={4} md={3} key={box.name}>
+                    <Grid item xs={12} sm={4} md={3} key={box._id}>
                         <DraggableBox box={box} onDragStart={handleDragStart} onDrop={handleDrop} onClick={handleBoxClick} />
                     </Grid>
                 ))}
 
-                {/* Add New Box Button */}
                 <Grid item xs={12} sm={4} md={3}>
                     <Button
                         variant="contained"
@@ -151,14 +156,12 @@ const SubBudgetScreen = () => {
                 </Grid>
             </Grid>
 
-            {/* Add Box Modal */}
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
                     <AddBoxForm onClose={() => setShowAddModal(false)} onSave={handleAddBox} />
                 </Box>
             </Modal>
 
-            {/* Transfer Modal */}
             <Modal open={Boolean(transferPopup)} onClose={() => setTransferPopup(null)}>
                 <Box
                     sx={{

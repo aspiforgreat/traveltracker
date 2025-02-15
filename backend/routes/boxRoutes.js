@@ -4,7 +4,7 @@ import Box from "../models/Box.js";
 const router = express.Router();
 
 // Get All Boxes (or filter by parent ID)
-router.get("/", async (req, res) => {
+router.get("/boxes", async (req, res) => {
     try {
         const parentId = req.query.parentId || null;
         const boxes = await Box.find({ parentId });
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 });
 
 // Create a New Box
-router.post("/", async (req, res) => {
+router.post("/boxes", async (req, res) => {
     try {
         const newBox = new Box(req.body);
         await newBox.save();
@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update a Box
-router.put("/:id", async (req, res) => {
+router.put("/boxes/:id", async (req, res) => {
     try {
         const updatedBox = await Box.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(updatedBox);
@@ -36,7 +36,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete a Box
-router.delete("/:id", async (req, res) => {
+router.delete("/boxes/:id", async (req, res) => {
     try {
         await Box.findByIdAndDelete(req.params.id);
         res.json({ message: "Box deleted" });

@@ -25,6 +25,7 @@ const DetailPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const box = location.state?.box;
+    const baseUrl = "http://localhost:8000"; // Added baseUrl for persistence
     const maxHandles = 5;
 
     const [handles, setHandles] = useState(box?.handles || []);
@@ -130,6 +131,26 @@ const DetailPage = () => {
         }
     };
 
+    // --- NEW: Persist changes to the backend with a 1s cooldown ---
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (box?._id) {
+                const updatedFields = { handles, regionNames, regionColors };
+                fetch(`${baseUrl}/api/boxes/${box._id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedFields)
+                })
+                    .then((res) => res.json())
+                    .then((data) => console.log("Box updated:", data))
+                    .catch((err) => console.error("Error updating box:", err));
+            }
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [handles, regionNames, regionColors, box, baseUrl]);
+    // --- End of persistence code ---
+
     return (
         <div className="detail-page">
             <button className="back-button" onClick={() => navigate(-1)}>
@@ -216,6 +237,20 @@ const DetailPage = () => {
                     <Button variant="contained" onClick={addHandle} disabled={handles.length >= maxHandles}>
                         Add Budget
                     </Button>
+
+                    {/* Numeric Input Fields for Each Region */}
+                    <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+                        {computedMoneyRegions.map((money, index) => (
+                            <TextField
+                                key={index}
+                                type="number"
+                                label={regionNames[index] || `Region ${index + 1}`}
+                                value={money}
+                                onChange={(e) => handleMoneyInputChange(index, Number(e.target.value))}
+                                fullWidth
+                            />
+                        ))}
+                    </Box>
                 </Box>
             </Container>
 

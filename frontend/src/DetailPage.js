@@ -38,7 +38,6 @@ const DetailPage = () => {
                 body: JSON.stringify(updatedFields)
             })
                 .then(res => res.json())
-                .then(data => console.log("Box updated:", data))
                 .catch(err => console.error("Error updating box:", err));
         }
     }, [handles, regionNames, regionColors, box, baseUrl]);

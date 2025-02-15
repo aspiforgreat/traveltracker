@@ -1,12 +1,12 @@
 // SubBudgetScreen.js
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
 import AddBoxForm from "./AddBoxForm";
 import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
 
-const DraggableBox = ({ name, number, onDragStart, onDrop, onClick }) => {
+const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
     return (
         <Paper
             elevation={3}
@@ -19,39 +19,49 @@ const DraggableBox = ({ name, number, onDragStart, onDrop, onClick }) => {
                 "&:hover": { backgroundColor: "#f0f0f0" },
             }}
             draggable
-            onDragStart={(e) => onDragStart(e, name, number)}
+            onDragStart={(e) => onDragStart(e, box)}
             onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => onDrop(e, name, number)}
-            onClick={() => onClick(name, number)}
+            onDrop={(e) => onDrop(e, box)}
+            onClick={() => onClick(box)}
         >
-            <Typography variant="h6">{name}</Typography>
+            <Typography variant="h6">{box.name}</Typography>
             <Typography variant="subtitle1" color="primary">
-                {number}
+                {box.number}
             </Typography>
         </Paper>
     );
 };
 
 const SubBudgetScreen = () => {
-    const [boxes, setBoxes] = useState([
-        { name: "Box A", number: 100 },
-        { name: "Box B", number: 50 },
-    ]);
+    const navigate = useNavigate();
+    const location = useLocation();
+    // If a parent box is provided, we are in a nested subbudget screen.
+    const parentBox = location.state?.box;
+
+    // Use a clean slate for nested subbudgets (start with an empty array)
+    // Otherwise, use default boxes.
+    const [boxes, setBoxes] = useState(
+        parentBox
+            ? []
+            : [
+                { name: "Box A", number: 100, subbudgetEnabled: false },
+                { name: "Box B", number: 50, subbudgetEnabled: false },
+            ]
+    );
     const [showAddModal, setShowAddModal] = useState(false);
     const [draggedBox, setDraggedBox] = useState(null);
     const [transferPopup, setTransferPopup] = useState(null);
     const [transferAmount, setTransferAmount] = useState("");
-    const navigate = useNavigate();
 
-    const handleDragStart = (e, name, number) => {
-        setDraggedBox({ name, number });
+    const handleDragStart = (e, box) => {
+        setDraggedBox(box);
     };
 
-    const handleDrop = (e, targetName, targetNumber) => {
-        if (draggedBox && draggedBox.name !== targetName) {
+    const handleDrop = (e, targetBox) => {
+        if (draggedBox && draggedBox.name !== targetBox.name) {
             setTransferPopup({
                 from: draggedBox,
-                to: { name: targetName, number: targetNumber },
+                to: targetBox,
             });
             setDraggedBox(null);
         }
@@ -61,7 +71,6 @@ const SubBudgetScreen = () => {
         const amount = parseInt(transferAmount);
         if (!isNaN(amount) && transferPopup) {
             const maxTransferAmount = Math.min(transferPopup.from.number, amount);
-
             setBoxes((prevBoxes) =>
                 prevBoxes.map((box) => {
                     if (box.name === transferPopup.from.name) {
@@ -78,33 +87,55 @@ const SubBudgetScreen = () => {
         }
     };
 
-    const handleAddBox = (name, number) => {
-        setBoxes([...boxes, { name, number }]);
+    const handleAddBox = (name, number, subbudgetEnabled) => {
+        setBoxes([...boxes, { name, number, subbudgetEnabled }]);
         setShowAddModal(false);
+    };
+
+    // When a box is clicked, check its subbudget flag.
+    const handleBoxClick = (box) => {
+        if (box.subbudgetEnabled) {
+            // Navigate to a nested SubBudgetScreen with this box as parent.
+            navigate("/subbudget", { state: { box } });
+        } else {
+            // Navigate to the standard DetailPage.
+            navigate("/detail", { state: { box } });
+        }
     };
 
     return (
         <Container sx={{ mt: 5 }}>
-            {/* Total Display Component */}
-            <TotalDisplay boxes={boxes} />
+            {/* Conditional Back Navigation: Only show when in a nested subbudget */}
+            {parentBox && (
+                <Box sx={{ mb: 2 }}>
+                    <Button variant="outlined" onClick={() => navigate(-1)}>
+                        Back
+                    </Button>
+                </Box>
+            )}
 
-            {/* MultiSliderBar Component for adjusting allocations */}
+            {/* Show parent info if in a nested screen */}
+            {parentBox && (
+                <Typography variant="h5" gutterBottom>
+                    Subbudget for {parentBox.name} (Total: {parentBox.number})
+                </Typography>
+            )}
+
+            {/* Total Display Component */}
+            <TotalDisplay boxes={parentBox ? [{ name: parentBox.name, number: parentBox.number }] : boxes} />
+
+            {/* MultiSliderBar for adjusting allocations */}
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} />
 
             <Typography variant="h6" gutterBottom>
-                Countries
+                {parentBox ? "Sub-Boxes" : "Countries"}
             </Typography>
 
             {/* Grid of Draggable Boxes */}
             <Grid container spacing={2} justifyContent="center">
                 {boxes.map((box) => (
                     <Grid item xs={12} sm={4} md={3} key={box.name}>
-                        <DraggableBox
-                            {...box}
-                            onDragStart={handleDragStart}
-                            onDrop={handleDrop}
-                            onClick={() => navigate("/detail", { state: { box } })}
-                        />
+                        <DraggableBox box={box} onDragStart={handleDragStart} onDrop={handleDrop} onClick={handleBoxClick} />
                     </Grid>
                 ))}
 
@@ -122,14 +153,7 @@ const SubBudgetScreen = () => {
 
             {/* Add Box Modal */}
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100vh",
-                    }}
-                >
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
                     <AddBoxForm onClose={() => setShowAddModal(false)} onSave={handleAddBox} />
                 </Box>
             </Modal>

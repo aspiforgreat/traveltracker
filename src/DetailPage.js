@@ -59,7 +59,7 @@ const DetailPage = () => {
 
     return (
         <div className="detail-page">
-            <button className="back-button" onClick={() => navigate("/")}>← Back</button>
+            <button className="back-button" onClick={() => navigate(-1)}>← Back</button>
             <div className="box-info">
                 <h2>{box?.name}</h2>
                 <p>Budget: {box?.number}</p>

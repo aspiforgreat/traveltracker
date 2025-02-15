@@ -5,8 +5,9 @@ import { Box, Button, Container, Grid, Paper, Typography, Modal, TextField } fro
 import AddBoxForm from "./AddBoxForm";
 import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
+const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
     return (
         <Paper
             elevation={3}
@@ -17,6 +18,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
                 cursor: "pointer",
                 backgroundColor: "#fff",
                 "&:hover": { backgroundColor: "#f0f0f0" },
+                position: "relative", // Allow positioning of the delete button
             }}
             draggable
             onDragStart={(e) => onDragStart(e, box)}
@@ -28,6 +30,35 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
             <Typography variant="subtitle1" color="primary">
                 {box.number}
             </Typography>
+
+            {/* Delete button in the top-right corner */}
+
+            <Button
+                sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    minWidth: "auto",
+                    padding: "4px",
+                    borderRadius: "50%", // Circular button
+                    bgcolor: "#fff", // White background
+                    border: "1px solid #f44336", // Red border to signify delete action
+                    color: "#f44336", // Red color for the icon
+                    "&:hover": {
+                        bgcolor: "#f44336", // Red background on hover
+                        color: "#fff", // White color for the icon when hovered
+                    },
+                }}
+                size="small"
+                onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering onClick for the box
+                    onDelete(box);
+                }}
+            >
+                <DeleteIcon fontSize="small" />
+            </Button>
+
+
         </Paper>
     );
 };
@@ -150,10 +181,6 @@ const SubBudgetScreen = () => {
         }
     };
 
-
-
-
-
     // Called when the parent's total budget is updated via the TextField.
     const handleSaveParentTotal = async () => {
         if (!parentData) return;
@@ -163,6 +190,20 @@ const SubBudgetScreen = () => {
             console.log("Parent budget updated successfully.");
         } catch (error) {
             console.error("Error saving parent's total", error);
+        }
+    };
+
+    // Delete box handler
+    const handleDeleteBox = async (box) => {
+        try {
+            // Send delete request to backend
+            await axios.delete(`${baseUrl}/api/boxes/${box._id}`);
+
+            // Remove the box from the state
+            setBoxes((prevBoxes) => prevBoxes.filter((b) => b._id !== box._id));
+            console.log("Box deleted successfully.");
+        } catch (error) {
+            console.error("Error deleting box", error);
         }
     };
 
@@ -181,7 +222,6 @@ const SubBudgetScreen = () => {
                     <Typography variant="h5" gutterBottom>
                         Subbudget for {parentData.name} (Total: {parentData.number})
                     </Typography>
-
                 </>
             )}
 
@@ -193,8 +233,7 @@ const SubBudgetScreen = () => {
                 }
             />
 
-            <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes}   onAllocationsCommit={handleSaveAllocations} // Save automatically when user stops sliding
-            />
+            <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
                 {parentData ? "Sub-Boxes" : "Countries"}
@@ -208,6 +247,7 @@ const SubBudgetScreen = () => {
                             onDragStart={handleDragStart}
                             onDrop={handleDrop}
                             onClick={handleBoxClick}
+                            onDelete={handleDeleteBox} // Pass the delete handler
                         />
                     </Grid>
                 ))}

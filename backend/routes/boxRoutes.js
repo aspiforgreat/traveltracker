@@ -17,8 +17,10 @@ router.get("/boxes", async (req, res) => {
 // Create a new box
 router.post("/boxes", async (req, res) => {
     try {
-        const { name, number, parentId, isSubBudgetEnabled } = req.body;
-        const newBox = new Box({ name, number, parentId, isSubBudgetEnabled });
+        const { name, number, parentId, isSubBudgetEnabled, regionNames } = req.body; // Include regionNames
+
+        const newBox = new Box({ name, number, parentId, isSubBudgetEnabled, regionNames }); // Add regionNames
+
         const savedBox = await newBox.save();
 
         // If it's a child box, add it to the parent's `children` array
@@ -31,6 +33,7 @@ router.post("/boxes", async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 });
+
 
 // Update a box
 router.put("/boxes/:id", async (req, res) => {

@@ -20,6 +20,7 @@ const AddBoxForm = ({ onClose, onSave }) => {
         const parsedNumber = parseInt(number);
         if (name && !isNaN(parsedNumber)) {
             const selectedRegions = Object.keys(regionToggles).filter((key) => regionToggles[key]);
+            console.log(selectedRegions);
             onSave(name, parsedNumber, subbudgetEnabled, selectedRegions);
         }
     };

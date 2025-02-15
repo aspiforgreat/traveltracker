@@ -20,7 +20,7 @@ const DetailPage = () => {
 
     // Initialize slider and region states from the box if present; otherwise use defaults.
     const [handles, setHandles] = useState(box?.handles || []);
-    const [regionNames, setRegionNames] = useState(box?.regionNames || [""]);
+    const [regionNames, setRegionNames] = useState(box?.regionNames || []);
     const [regionColors, setRegionColors] = useState(box?.regionColors || []);
     const [modalOpen, setModalOpen] = useState(false);
     const [defaultRegionName, setDefaultRegionName] = useState("");
@@ -42,6 +42,17 @@ const DetailPage = () => {
         }
     }, [handles, regionNames, regionColors, box, baseUrl]);
 
+    useEffect(() => {
+        if (handles.length === 0 && regionNames.length > 0) {
+            const newHandles = regionNames
+                .slice(0, regionNames.length - 1) // Exclude last region as it fills remaining space
+                .map((_, index) => Math.round(((index + 1) / regionNames.length) * 100));
+
+            setHandles(newHandles);
+            setRegionColors(regionNames.map(() => getRandomColor(regionColors))); // Assign colors
+        }
+    }, [regionNames]); // Trigger only when regionNames change
+
     const handleSliderChange = (event, newValue) => {
         if (Array.isArray(newValue)) {
             setHandles([...newValue].sort((a, b) => a - b));
@@ -51,22 +62,38 @@ const DetailPage = () => {
     const addHandle = () => {
         if (handles.length < maxHandles) {
             let newHandle = handles.length === 0 ? 50 : Math.min(handles[handles.length - 1] + 10, 100);
-            setHandles([...handles, newHandle].sort((a, b) => a - b));
-            setRegionColors([...regionColors, getRandomColor(regionColors)]);
-            setModalOpen(true);
+
+            if (regionNames.length === 0) {
+                // If no region names exist, rename the first region and the rest (split into two)
+                setNamingType("both");
+                setModalOpen(true);
+            } else {
+                setHandles([...handles, newHandle].sort((a, b) => a - b));
+                setRegionColors([...regionColors, getRandomColor(regionColors)]);
+                setNamingType("new");
+                setModalOpen(true);
+            }
         }
     };
 
     const handleRegionNameSubmit = () => {
         if (namingType === "both") {
-            setRegionNames([defaultRegionName, newRegionName]);
+            // Rename the first region and the remaining region as two regions
+            setRegionNames([defaultRegionName, newRegionName]);  // Assign names
+            setHandles([50]); // Divide the budget into two equal regions
+            setRegionColors([getRandomColor(regionColors), getRandomColor(regionColors)]); // Assign colors
+
+            setDefaultRegionName("");
+            setNewRegionName("");
+            setNamingType("new"); // Now, allow new region naming
+            setModalOpen(false);
         } else {
+            // Just add the new region name
             setRegionNames([...regionNames, newRegionName]);
+            setDefaultRegionName("");
+            setNewRegionName("");
+            setModalOpen(false);
         }
-        setDefaultRegionName("");
-        setNewRegionName("");
-        setNamingType("new");
-        setModalOpen(false);
     };
 
     let computedRegions = handles.length > 0
@@ -150,7 +177,9 @@ const DetailPage = () => {
             <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
                 <Box sx={{ p: 3, bgcolor: "white", borderRadius: 2, width: 300, mx: "auto", mt: "20vh" }}>
                     <Typography variant="h6">
-                        {namingType === "both" ? "Name Default and New Region" : "Name New Region"}
+                        {namingType === "both"
+                            ? "Name Default and New Region"
+                            : "Name New Region"}
                     </Typography>
                     {namingType === "both" && (
                         <TextField

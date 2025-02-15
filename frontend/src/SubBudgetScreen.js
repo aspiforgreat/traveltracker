@@ -96,13 +96,15 @@ const SubBudgetScreen = () => {
         }
     };
 
-    const handleAddBox = async (name, number, subbudgetEnabled) => {
+    const handleAddBox = async (name, number, subbudgetEnabled, selectedRegions) => {
         try {
+            console.log(selectedRegions)
             const newBox = {
                 name,
                 number,
-                isSubBudgetEnabled: subbudgetEnabled, // Ensure this is passed correctly
+                isSubBudgetEnabled: subbudgetEnabled,
                 parentId: parentBox?._id || null,
+                regionNames: selectedRegions, // Add selected regions here
             };
 
             const response = await axios.post(baseUrl + "/api/boxes", newBox);

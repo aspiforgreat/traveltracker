@@ -22,6 +22,7 @@ app.use("/api", boxRoutes);
 
 // Catch-all to send "Hello" (or you can serve the React app later)
 app.get("*", (req, res) => {
+    console.log("Route not found");
     res.send("Hello");
 });
 

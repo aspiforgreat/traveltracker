@@ -3,8 +3,10 @@ import mongoose from "mongoose";
 const BoxSchema = new mongoose.Schema({
     name: { type: String, required: true },
     number: { type: Number, required: true },
-    isSubBudgetEnabled: { type: Boolean, default: false },
     parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Box", default: null },
+    isSubBudgetEnabled: { type: Boolean, default: false },
+    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Box" }] // New: Store child boxes
 });
 
-export default mongoose.model("Box", BoxSchema);
+const Box = mongoose.model("Box", BoxSchema);
+export default Box;

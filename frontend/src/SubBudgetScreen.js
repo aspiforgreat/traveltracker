@@ -45,16 +45,17 @@ const SubBudgetScreen = () => {
     const [transferPopup, setTransferPopup] = useState(null);
     const [transferAmount, setTransferAmount] = useState("");
 
-    // Fetch boxes from the backend
     useEffect(() => {
         const fetchBoxes = async () => {
             try {
                 const response = await axios.get(baseUrl + "/api/boxes", {
                     params: { parentId: parentBox?._id || null },
                 });
+                console.log("Fetched Boxes:", response.data); // Debugging
                 setBoxes(response.data);
             } catch (error) {
                 console.error("Error fetching boxes:", error);
+                setBoxes([]); // Ensure boxes is always an array
             }
         };
 
@@ -97,7 +98,13 @@ const SubBudgetScreen = () => {
 
     const handleAddBox = async (name, number, subbudgetEnabled) => {
         try {
-            const newBox = { name, number, subbudgetEnabled, parentId: parentBox?._id || null };
+            const newBox = {
+                name,
+                number,
+                isSubBudgetEnabled: subbudgetEnabled, // Ensure this is passed correctly
+                parentId: parentBox?._id || null,
+            };
+
             const response = await axios.post(baseUrl + "/api/boxes", newBox);
             setBoxes((prevBoxes) => [...prevBoxes, response.data]);
             setShowAddModal(false);
@@ -106,6 +113,7 @@ const SubBudgetScreen = () => {
         }
     };
 
+
     const handleBoxClick = (box) => {
         if (box.isSubBudgetEnabled) {
             navigate("/subbudget", { state: { box } });
@@ -113,6 +121,7 @@ const SubBudgetScreen = () => {
             navigate("/detail", { state: { box } });
         }
     };
+
 
     return (
         <Container sx={{ mt: 5 }}>

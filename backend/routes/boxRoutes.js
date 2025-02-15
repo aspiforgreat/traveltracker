@@ -75,4 +75,15 @@ router.delete("/boxes", async (req, res) => {
     }
 });
 
+// Update a box (PATCH version for partial updates)
+router.patch("/boxes/:id", async (req, res) => {
+    try {
+        const updatedBox = await Box.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedBox);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+
 export default router;

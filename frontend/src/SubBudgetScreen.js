@@ -6,7 +6,6 @@ import AddBoxForm from "./AddBoxForm";
 import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
 
-
 const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
     return (
         <Paper
@@ -34,11 +33,15 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick }) => {
 };
 
 const SubBudgetScreen = () => {
-
-    const baseUrl =  "http://localhost:8000";
+    const baseUrl = "http://localhost:8000";
     const navigate = useNavigate();
     const location = useLocation();
     const parentBox = location.state?.box;
+
+    // If a parent exists, keep a separate state for it so its total can be updated.
+    const [parentData, setParentData] = useState(parentBox);
+    const [parentTotal, setParentTotal] = useState(parentBox?.number || 0);
+
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
     const [draggedBox, setDraggedBox] = useState(null);
@@ -76,21 +79,33 @@ const SubBudgetScreen = () => {
         }
     };
 
-    const handleTransfer = () => {
+    // When a transfer is confirmed, update state and persist changes to backend.
+    const handleTransfer = async () => {
         const amount = parseInt(transferAmount);
         if (!isNaN(amount) && transferPopup) {
             const maxTransferAmount = Math.min(transferPopup.from.number, amount);
-            setBoxes((prevBoxes) =>
-                prevBoxes.map((box) => {
-                    if (box.name === transferPopup.from.name) {
-                        return { ...box, number: Math.max(0, box.number - maxTransferAmount) };
-                    }
-                    if (box.name === transferPopup.to.name) {
-                        return { ...box, number: box.number + maxTransferAmount };
-                    }
-                    return box;
-                })
-            );
+            // Calculate new allocations
+            const updatedBoxes = boxes.map((box) => {
+                if (box._id === transferPopup.from._id) {
+                    return { ...box, number: Math.max(0, box.number - maxTransferAmount) };
+                }
+                if (box._id === transferPopup.to._id) {
+                    return { ...box, number: box.number + maxTransferAmount };
+                }
+                return box;
+            });
+            setBoxes(updatedBoxes);
+
+            // Persist the changes for both boxes
+            const fromBox = updatedBoxes.find(box => box._id === transferPopup.from._id);
+            const toBox = updatedBoxes.find(box => box._id === transferPopup.to._id);
+
+            try {
+                await axios.patch(`${baseUrl}/api/boxes/${fromBox._id}`, { number: fromBox.number });
+                await axios.patch(`${baseUrl}/api/boxes/${toBox._id}`, { number: toBox.number });
+            } catch (error) {
+                console.error("Error saving transfer", error);
+            }
             setTransferPopup(null);
             setTransferAmount("");
         }
@@ -98,7 +113,7 @@ const SubBudgetScreen = () => {
 
     const handleAddBox = async (name, number, subbudgetEnabled, selectedRegions) => {
         try {
-            console.log(selectedRegions)
+            console.log(selectedRegions);
             const newBox = {
                 name,
                 number,
@@ -115,7 +130,6 @@ const SubBudgetScreen = () => {
         }
     };
 
-
     const handleBoxClick = (box) => {
         if (box.isSubBudgetEnabled) {
             navigate("/subbudget", { state: { box } });
@@ -124,10 +138,37 @@ const SubBudgetScreen = () => {
         }
     };
 
+    const handleSaveAllocations = async () => {
+        try {
+            const updatePromises = boxes.map((box) =>
+                axios.put(`${baseUrl}/api/boxes/${box._id}`, { number: box.number })
+            );
+            await Promise.all(updatePromises);
+            console.log("Allocations saved successfully.");
+        } catch (error) {
+            console.error("Error saving allocations", error);
+        }
+    };
+
+
+
+
+
+    // Called when the parent's total budget is updated via the TextField.
+    const handleSaveParentTotal = async () => {
+        if (!parentData) return;
+        try {
+            const response = await axios.patch(`${baseUrl}/api/boxes/${parentData._id}`, { number: parentTotal });
+            setParentData(response.data);
+            console.log("Parent budget updated successfully.");
+        } catch (error) {
+            console.error("Error saving parent's total", error);
+        }
+    };
 
     return (
         <Container sx={{ mt: 5 }}>
-            {parentBox && (
+            {parentData && (
                 <Box sx={{ mb: 2 }}>
                     <Button variant="outlined" onClick={() => navigate(-1)}>
                         Back
@@ -135,24 +176,39 @@ const SubBudgetScreen = () => {
                 </Box>
             )}
 
-            {parentBox && (
-                <Typography variant="h5" gutterBottom>
-                    Subbudget for {parentBox.name} (Total: {parentBox.number})
-                </Typography>
+            {parentData && (
+                <>
+                    <Typography variant="h5" gutterBottom>
+                        Subbudget for {parentData.name} (Total: {parentData.number})
+                    </Typography>
+
+                </>
             )}
 
-            <TotalDisplay boxes={parentBox ? [{ name: parentBox.name, number: parentBox.number }] : boxes} />
+            <TotalDisplay
+                boxes={
+                    parentData
+                        ? [{ name: parentData.name, number: parentData.number }]
+                        : boxes
+                }
+            />
 
-            <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} />
+            <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes}   onAllocationsCommit={handleSaveAllocations} // Save automatically when user stops sliding
+            />
 
-            <Typography variant="h6" gutterBottom>
-                {parentBox ? "Sub-Boxes" : "Countries"}
+            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                {parentData ? "Sub-Boxes" : "Countries"}
             </Typography>
 
             <Grid container spacing={2} justifyContent="center">
                 {boxes.map((box) => (
                     <Grid item xs={12} sm={4} md={3} key={box._id}>
-                        <DraggableBox box={box} onDragStart={handleDragStart} onDrop={handleDrop} onClick={handleBoxClick} />
+                        <DraggableBox
+                            box={box}
+                            onDragStart={handleDragStart}
+                            onDrop={handleDrop}
+                            onClick={handleBoxClick}
+                        />
                     </Grid>
                 ))}
 

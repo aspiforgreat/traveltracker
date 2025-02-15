@@ -1,4 +1,3 @@
-// AddBoxForm.js
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, Checkbox, FormControlLabel } from "@mui/material";
 
@@ -13,6 +12,14 @@ const AddBoxForm = ({ onClose, onSave }) => {
 
     const handleToggleChange = (event) => {
         setRegionToggles({ ...regionToggles, [event.target.name]: event.target.checked });
+    };
+
+    const handleSubbudgetToggle = (event) => {
+        setSubbudgetEnabled(event.target.checked);
+        if (event.target.checked) {
+            // Clear all selected regions when enabling subbudgets
+            setRegionToggles(Object.fromEntries(regionNames.map(region => [region, false])));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -32,13 +39,27 @@ const AddBoxForm = ({ onClose, onSave }) => {
             </Typography>
             <TextField fullWidth label="Name" variant="outlined" sx={{ mt: 2 }} value={name} onChange={(e) => setName(e.target.value)} />
             <TextField fullWidth label="Number" variant="outlined" type="number" sx={{ mt: 2 }} value={number} onChange={(e) => setNumber(e.target.value)} />
-            <FormControlLabel control={<Checkbox checked={subbudgetEnabled} onChange={(e) => setSubbudgetEnabled(e.target.checked)} />} label="Enable Subbudgets" sx={{ mt: 2 }} />
 
+            {/* Enable Subbudgets Checkbox */}
+            <FormControlLabel
+                control={<Checkbox checked={subbudgetEnabled} onChange={handleSubbudgetToggle} />}
+                label="Enable Subbudgets"
+                sx={{ mt: 2 }}
+            />
+
+            {/* Region Selection - Disabled when subbudgets are enabled */}
             <Typography variant="subtitle1" sx={{ mt: 2 }}>Select Regions:</Typography>
             {regionNames.map((key) => (
                 <FormControlLabel
                     key={key}
-                    control={<Checkbox name={key} checked={regionToggles[key]} onChange={handleToggleChange} />}
+                    control={
+                        <Checkbox
+                            name={key}
+                            checked={regionToggles[key]}
+                            onChange={handleToggleChange}
+                            disabled={subbudgetEnabled} // Disable checkboxes if subbudgets are enabled
+                        />
+                    }
                     label={key.charAt(0).toUpperCase() + key.slice(1)}
                 />
             ))}

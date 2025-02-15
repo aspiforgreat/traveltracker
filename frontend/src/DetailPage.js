@@ -216,34 +216,6 @@ const DetailPage = () => {
                     <Button variant="contained" onClick={addHandle} disabled={handles.length >= maxHandles}>
                         Add Budget
                     </Button>
-
-                    {/* Scrollable Inputs */}
-                    <Box
-                        sx={{
-                            flexGrow: 1,
-                            maxHeight: "50vh",
-                            overflowY: "auto",
-                            paddingRight: "10px",
-                            paddingTop: "10px",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 2,
-                            width: "100%",
-                        }}
-                    >
-                        {computedRegions.map((region, index) => (
-                            <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-                                <TextField
-                                    label={regionNames[index] || "Unnamed"}
-                                    type="number"
-                                    value={box?.number ? Math.round((region / 100) * box.number) : ""}
-                                    onChange={(e) => handleMoneyInputChange(index, parseFloat(e.target.value))}
-                                    fullWidth
-                                    sx={{ mr: 2 }}
-                                />
-                            </Box>
-                        ))}
-                    </Box>
                 </Box>
             </Container>
 

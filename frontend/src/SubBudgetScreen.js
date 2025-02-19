@@ -220,18 +220,18 @@ const SubBudgetScreen = () => {
             {parentData && (
                 <>
                     <Typography variant="h5" gutterBottom>
-                        Subbudget for {parentData.name} (Total: {parentData.number})
+                        Subbudget for {parentData.name}
                     </Typography>
                 </>
             )}
 
             <TotalDisplay
-                boxes={
-                    parentData
-                        ? [{ name: parentData.name, number: parentData.number }]
-                        : boxes
-                }
+                boxes={boxes}
+                parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal}
+                setParentTotal={setParentTotal}
+                isHomepage={!parentData}
             />
+
 
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
 

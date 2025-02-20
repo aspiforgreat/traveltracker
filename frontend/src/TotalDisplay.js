@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit"; // Pencil icon for edit
 
@@ -22,10 +22,53 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
         setShowModal(false);
     };
 
-    const handleSaveUserTotal = () => {
+    useEffect(() => {
+        const fetchBudget = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/api/budget");
+                if (!response.ok) {
+                    throw new Error("Error fetching budget");
+                }
+                const data = await response.json();
+                setUserTotal(data.number); // Update the state with the fetched budget number
+                setParentTotal({ number: data.number }); // Also update the parent state
+            } catch (error) {
+                console.error("Error fetching budget:", error);
+            }
+        };
+
+        fetchBudget();
+    }, [setParentTotal]); // Run only once on component mount
+
+
+    const handleSaveUserTotal = async () => {
+        const baseUrl = "http://localhost:8000";
         const inputTotal = parseFloat(userTotal);
         if (!isNaN(inputTotal)) {
-            setParentTotal({ number: inputTotal }); // Ensure it's an object
+            // Update parent total locally
+            setParentTotal({ number: inputTotal });
+
+            // Send the API request to update the budget goal
+            try {
+                const response = await fetch(baseUrl+ `/api/budget/`, {
+                    method: 'PATCH',  // Use PATCH to update the budget goal
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ number: inputTotal }),  // send the updated total
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error updating budget');
+                }
+
+                // Optionally: show success message or handle response here
+                console.log("Budget updated successfully");
+
+            } catch (error) {
+                // Handle error (e.g., show error message)
+                console.error("Error updating budget:", error);
+            }
         }
         setShowModal(false);
     };

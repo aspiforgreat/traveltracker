@@ -6,6 +6,7 @@ import boxRoutes from "./routes/boxRoutes.js";  // Import your routes
 const app = express();
 
 import mongoose from "mongoose";
+import budgetRoutes from "./routes/budgetRoutes.js";
 
 const MONGO_URI = "mongodb://localhost:27017/budgetDatabase"; // Change to your database name
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(express.json()); // For parsing application/json
 // Use your routes for handling "/api/boxes"
 app.use("/api", boxRoutes);
+app.use("/api/budget",budgetRoutes)
 
 // Catch-all to send "Hello" (or you can serve the React app later)
 app.get("*", (req, res) => {

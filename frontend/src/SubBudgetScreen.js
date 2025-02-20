@@ -18,7 +18,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                 cursor: "pointer",
                 backgroundColor: "#fff",
                 "&:hover": { backgroundColor: "#f0f0f0" },
-                position: "relative", // Allow positioning of the delete button
+                position: "relative",
             }}
             draggable
             onDragStart={(e) => onDragStart(e, box)}
@@ -30,9 +30,6 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
             <Typography variant="subtitle1" color="primary">
                 {box.number}
             </Typography>
-
-            {/* Delete button in the top-right corner */}
-
             <Button
                 sx={{
                     position: "absolute",
@@ -40,25 +37,23 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     right: 8,
                     minWidth: "auto",
                     padding: "4px",
-                    borderRadius: "50%", // Circular button
-                    bgcolor: "#fff", // White background
-                    border: "1px solid #f44336", // Red border to signify delete action
-                    color: "#f44336", // Red color for the icon
+                    borderRadius: "50%",
+                    bgcolor: "#fff",
+                    border: "1px solid #f44336",
+                    color: "#f44336",
                     "&:hover": {
-                        bgcolor: "#f44336", // Red background on hover
-                        color: "#fff", // White color for the icon when hovered
+                        bgcolor: "#f44336",
+                        color: "#fff",
                     },
                 }}
                 size="small"
                 onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering onClick for the box
+                    e.stopPropagation();
                     onDelete(box);
                 }}
             >
                 <DeleteIcon fontSize="small" />
             </Button>
-
-
         </Paper>
     );
 };
@@ -69,10 +64,10 @@ const SubBudgetScreen = () => {
     const location = useLocation();
     const parentBox = location.state?.box;
 
-    // If a parent exists, keep a separate state for it so its total can be updated.
     const [parentData, setParentData] = useState(parentBox);
-    const [parentTotal, setParentTotal] = useState(parentBox?.number || 0);
-
+    const [parentTotal, setParentTotal] = useState(
+        parentBox ? { number: parentBox.number } : { number: 0 }
+    );
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
     const [draggedBox, setDraggedBox] = useState(null);
@@ -85,14 +80,13 @@ const SubBudgetScreen = () => {
                 const response = await axios.get(baseUrl + "/api/boxes", {
                     params: { parentId: parentBox?._id || null },
                 });
-                console.log("Fetched Boxes:", response.data); // Debugging
+                console.log("Fetched Boxes:", response.data);
                 setBoxes(response.data);
             } catch (error) {
                 console.error("Error fetching boxes:", error);
-                setBoxes([]); // Ensure boxes is always an array
+                setBoxes([]);
             }
         };
-
         fetchBoxes();
     }, [parentBox]);
 
@@ -110,12 +104,10 @@ const SubBudgetScreen = () => {
         }
     };
 
-    // When a transfer is confirmed, update state and persist changes to backend.
     const handleTransfer = async () => {
         const amount = parseInt(transferAmount);
         if (!isNaN(amount) && transferPopup) {
             const maxTransferAmount = Math.min(transferPopup.from.number, amount);
-            // Calculate new allocations
             const updatedBoxes = boxes.map((box) => {
                 if (box._id === transferPopup.from._id) {
                     return { ...box, number: Math.max(0, box.number - maxTransferAmount) };
@@ -127,7 +119,6 @@ const SubBudgetScreen = () => {
             });
             setBoxes(updatedBoxes);
 
-            // Persist the changes for both boxes
             const fromBox = updatedBoxes.find(box => box._id === transferPopup.from._id);
             const toBox = updatedBoxes.find(box => box._id === transferPopup.to._id);
 
@@ -150,7 +141,7 @@ const SubBudgetScreen = () => {
                 number,
                 isSubBudgetEnabled: subbudgetEnabled,
                 parentId: parentBox?._id || null,
-                regionNames: selectedRegions, // Add selected regions here
+                regionNames: selectedRegions,
             };
 
             const response = await axios.post(baseUrl + "/api/boxes", newBox);
@@ -181,7 +172,6 @@ const SubBudgetScreen = () => {
         }
     };
 
-    // Called when the parent's total budget is updated via the TextField.
     const handleSaveParentTotal = async () => {
         if (!parentData) return;
         try {
@@ -193,19 +183,46 @@ const SubBudgetScreen = () => {
         }
     };
 
-    // Delete box handler
     const handleDeleteBox = async (box) => {
         try {
-            // Send delete request to backend
             await axios.delete(`${baseUrl}/api/boxes/${box._id}`);
-
-            // Remove the box from the state
             setBoxes((prevBoxes) => prevBoxes.filter((b) => b._id !== box._id));
             console.log("Box deleted successfully.");
         } catch (error) {
             console.error("Error deleting box", error);
         }
     };
+
+    // --- New: Redistribution logic ---
+    const handleRedistribute = async () => {
+        // Get the total budget entered by the user
+        const totalBudget = parentData ? parentData.number : parentTotal.number;
+        if (!totalBudget || boxes.length === 0) return;
+
+        // Calculate the sum of the current allocations
+        const currentSum = boxes.reduce((acc, box) => acc + box.number, 0);
+        if (currentSum === 0) return; // Prevent division by zero
+
+        // Recalculate each box's number proportionally
+        const redistributedBoxes = boxes.map((box) => {
+            const newNumber = Math.round((box.number / currentSum) * totalBudget);
+            return { ...box, number: newNumber };
+        });
+        setBoxes(redistributedBoxes);
+
+        // Optionally, persist the changes to the backend
+        try {
+            await Promise.all(
+                redistributedBoxes.map((box) =>
+                    axios.put(`${baseUrl}/api/boxes/${box._id}`, { number: box.number })
+                )
+            );
+            console.log("Redistributed allocations saved.");
+        } catch (error) {
+            console.error("Error saving redistributed allocations", error);
+        }
+    };
+    // --- End Redistribution logic ---
 
     return (
         <Container sx={{ mt: 5 }}>
@@ -227,13 +244,24 @@ const SubBudgetScreen = () => {
 
             <TotalDisplay
                 boxes={boxes}
-                parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal}
+                parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal.number}
                 setParentTotal={setParentTotal}
                 isHomepage={!parentData}
             />
 
-
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
+
+            {/* --- New: Redistribute Budget button --- */}
+            <Box sx={{ mt: 2, textAlign: "center" }}>
+                <Button
+                    variant="contained"
+                    onClick={handleRedistribute}
+                    disabled={!(parentData ? parentData.number > 0 : parentTotal.number > 0)}
+                >
+                    Redistribute Budget
+                </Button>
+            </Box>
+            {/* --- End new button --- */}
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
                 {parentData ? "Sub-Boxes" : "Countries"}
@@ -247,7 +275,7 @@ const SubBudgetScreen = () => {
                             onDragStart={handleDragStart}
                             onDrop={handleDrop}
                             onClick={handleBoxClick}
-                            onDelete={handleDeleteBox} // Pass the delete handler
+                            onDelete={handleDeleteBox}
                         />
                     </Grid>
                 ))}

@@ -12,8 +12,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
     const [showModal, setShowModal] = useState(false);
 
     const totalBoxSum = calculateTotal(boxes);
-    const difference = userTotal - totalBoxSum;
-    const differenceColor = difference >= 0 ? "green" : "red";
+    const differenceColor = userTotal - totalBoxSum >= 0 ? "green" : "red";
 
     const handleEditClick = () => {
         setShowModal(true);
@@ -26,10 +25,11 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
     const handleSaveUserTotal = () => {
         const inputTotal = parseFloat(userTotal);
         if (!isNaN(inputTotal)) {
-            setParentTotal({ name: parentTotal.name, number: inputTotal }); // Update parentTotal with new number
+            setParentTotal({ number: inputTotal }); // Ensure it's an object
         }
         setShowModal(false);
     };
+
 
     return (
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
@@ -44,11 +44,11 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
                         onClick={handleEditClick}
                         startIcon={<EditIcon />} // Pencil icon for edit
                     >
-                        {parentTotal?.number} {/* Ensure parentTotal has 'name' and 'number' */}
+                        {parentTotal} {/* Ensure parentTotal has 'name' and 'number' */}
                     </Button>
                 ) : (
                     <Typography variant="h5" color="primary">
-                        {parentTotal?.number} {/* Display as Typography for sub-budgets */}
+                        {parentTotal.number} {/* Display as Typography for sub-budgets */}
                     </Typography>
                 )}
             </Box>
@@ -60,7 +60,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
             </Box>
             <Box>
                 <Typography variant="h6">Difference: </Typography>
-                <Typography variant="h5" color="primary">{(parentTotal?.number ?? 0) - totalBoxSum}</Typography>
+                <Typography variant="h5" color={differenceColor}>{(userTotal ??0 ) - totalBoxSum }</Typography>
             </Box>
 
             {/* Modal for Editing User Total */}

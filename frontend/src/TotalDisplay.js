@@ -103,7 +103,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
             </Box>
             <Box>
                 <Typography variant="h6">Difference: </Typography>
-                <Typography variant="h5" color={differenceColor}>{(userTotal ??0 ) - totalBoxSum }</Typography>
+                <Typography variant="h5" color={differenceColor}>{(isHomepage ? userTotal ?? 0  : parentTotal.number ?? 0 ) - totalBoxSum }</Typography>
             </Box>
 
             {/* Modal for Editing User Total */}

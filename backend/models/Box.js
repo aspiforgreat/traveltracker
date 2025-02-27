@@ -6,9 +6,14 @@ const BoxSchema = new mongoose.Schema({
     isSubBudgetEnabled: { type: Boolean, default: false },
     parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Box", default: null },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Box" }],
+    tripId: { type: mongoose.Schema.Types.ObjectId, ref: "Trip", required: true, index: true },
     handles: { type: [Number], default: [] },
     regionNames: { type: [String], default: [""] },
     regionColors: { type: [String], default: [] }
 });
+
+// Indexes for performance optimization
+BoxSchema.index({ tripId: 1, parentId: 1 }); // Compound index for trip-based queries
+BoxSchema.index({ parentId: 1 }); // Separate index for fast parent-child lookups
 
 export default mongoose.model("Box", BoxSchema);

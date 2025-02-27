@@ -36,7 +36,11 @@ const TripScreen = () => {
     // Handle form submission (create new trip)
     const handleSubmit = async () => {
         try {
-            await axios.post("http://localhost:8000/api/trips", newTrip);
+            const response = await axios.post("http://localhost:8000/api/trips", newTrip);
+
+            // Add the newly created trip to the trips state
+            setTrips((prevTrips) => [...prevTrips, response.data]);
+
             setOpenForm(false); // Close form dialog after submission
             setNewTrip({ name: "", description: "", startDate: "", endDate: "", budget: "" }); // Reset form fields
         } catch (error) {
@@ -52,6 +56,7 @@ const TripScreen = () => {
             </Button>
 
             {/* Trips List */}
+            {/* Trips List */}
             <List sx={{ marginTop: "20px" }}>
                 {trips.map((trip) => (
                     <ListItem button key={trip._id}>
@@ -60,7 +65,14 @@ const TripScreen = () => {
                         <Button
                             variant="outlined"
                             color="secondary"
-                            onClick={() => navigate("/subbudget", { state: { tripId: trip._id, tripName: trip.name } })}
+                            onClick={() => {
+                                // Log the tripId and tripName to the console before navigating
+                                console.log("Navigating to subbudget with:", {
+                                    tripId: trip._id,
+                                    tripName: trip.name
+                                });
+                                navigate("/subbudget", { state: { trip: trip} });
+                            }}
                         >
                             View Details
                         </Button>

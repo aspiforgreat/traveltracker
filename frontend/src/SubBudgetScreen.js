@@ -62,11 +62,12 @@ const SubBudgetScreen = () => {
     const baseUrl = "http://localhost:8000";
     const navigate = useNavigate();
     const location = useLocation();
-    const parentBox = location.state?.box;
+    const  trip = location.state?.trip;
+    const parentBox = location.state?.box; // Passed parentBox from previous screen
 
     const [parentData, setParentData] = useState(parentBox);
     const [parentTotal, setParentTotal] = useState(
-        parentBox ? { number: parentBox.number } : { number: 0 }
+        parentBox ? { number: parentBox.number } : { number: trip?.budget ?? 0 }
     );
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -77,18 +78,29 @@ const SubBudgetScreen = () => {
     useEffect(() => {
         const fetchBoxes = async () => {
             try {
-                const response = await axios.get(baseUrl + "/api/boxes", {
-                    params: { parentId: parentBox?._id || null },
-                });
-                console.log("Fetched Boxes:", response.data);
-                setBoxes(response.data);
+                if (trip) {
+                    // If a trip is passed, fetch the first-level boxes for that trip
+                    const response = await axios.get(baseUrl + "/api/boxes", {
+                        params: { parentId: null, tripId: trip._id }, // Fetch first-level boxes for the trip
+                    });
+                    console.log("Fetched Boxes for Trip:", response.data);
+                    setBoxes(response.data);
+                } else if (parentBox) {
+                    // If a parent box is passed, fetch its sub-boxes
+                    const response = await axios.get(baseUrl + "/api/boxes", {
+                        params: { parentId: parentBox._id },
+                    });
+                    console.log("Fetched Boxes for Parent Box:", response.data);
+                    setBoxes(response.data);
+                }
             } catch (error) {
                 console.error("Error fetching boxes:", error);
                 setBoxes([]);
             }
         };
         fetchBoxes();
-    }, [parentBox]);
+        console.log("trip ", trip);
+    }, [trip, parentBox]); // Fetch when either trip or parentBox changes
 
     const handleDragStart = (e, box) => {
         setDraggedBox(box);
@@ -135,17 +147,25 @@ const SubBudgetScreen = () => {
 
     const handleAddBox = async (name, number, subbudgetEnabled, selectedRegions) => {
         try {
-            console.log(selectedRegions);
+            // Get the tripId from the trip state or from props if it's passed down
+            const tripId = trip?._id || null; // Assuming `trip` is passed via props or location state
+            console.log("Adding box to trip:", tripId);
             const newBox = {
                 name,
                 number,
                 isSubBudgetEnabled: subbudgetEnabled,
                 parentId: parentBox?._id || null,
                 regionNames: selectedRegions,
+                tripId:  tripId, // Add the tripId here
             };
-
+            console.log("new box ", newBox);
+            // Make the request to the backend with the new box data
             const response = await axios.post(baseUrl + "/api/boxes", newBox);
+
+            // Update the state to reflect the newly added box
             setBoxes((prevBoxes) => [...prevBoxes, response.data]);
+
+            // Close the modal after successful submission
             setShowAddModal(false);
         } catch (error) {
             console.error("Error adding box:", error);
@@ -226,13 +246,12 @@ const SubBudgetScreen = () => {
 
     return (
         <Container sx={{ mt: 5 }}>
-            {parentData && (
                 <Box sx={{ mb: 2 }}>
                     <Button variant="outlined" onClick={() => navigate(-1)}>
                         Back
                     </Button>
                 </Box>
-            )}
+
 
             {parentData && (
                 <>
@@ -321,21 +340,20 @@ const SubBudgetScreen = () => {
                     </Typography>
                     <TextField
                         fullWidth
-                        label="Amount"
-                        type="number"
                         variant="outlined"
-                        sx={{ mt: 2 }}
+                        label="Amount"
                         value={transferAmount}
                         onChange={(e) => setTransferAmount(e.target.value)}
+                        sx={{ mt: 2 }}
                     />
-                    <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-                        <Button variant="contained" onClick={handleTransfer}>
-                            Confirm
-                        </Button>
-                        <Button variant="outlined" onClick={() => setTransferPopup(null)}>
-                            Cancel
-                        </Button>
-                    </Box>
+                    <Button
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                        onClick={handleTransfer}
+                        disabled={isNaN(transferAmount) || transferAmount <= 0}
+                    >
+                        Transfer
+                    </Button>
                 </Box>
             </Modal>
         </Container>

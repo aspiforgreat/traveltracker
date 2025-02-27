@@ -1,13 +1,19 @@
 import express from "express";
 import Box from "../models/Box.js";
+import  Trip from "../models/Trip.js";
 
 const router = express.Router();
 
-// Get all boxes (or filter by parent ID)
+// Get all boxes (or filter by trip and/or parent ID)
 router.get("/boxes", async (req, res) => {
     try {
-        const parentId = req.query.parentId || null;
-        const boxes = await Box.find({ parentId }).populate("children");
+        const { tripId, parentId } = req.query;
+        if (!tripId) return res.status(400).json({ error: "tripId is required" });
+
+        const filter = { tripId };
+        if (parentId) filter.parentId = parentId;
+
+        const boxes = await Box.find(filter).populate("children");
         res.json(boxes);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -15,17 +21,34 @@ router.get("/boxes", async (req, res) => {
 });
 
 // Create a new box
+
 router.post("/boxes", async (req, res) => {
     try {
-        const { name, number, parentId, isSubBudgetEnabled, regionNames } = req.body; // Include regionNames
+        const { name, number, parentId, isSubBudgetEnabled, regionNames, tripId } = req.body;
 
-        const newBox = new Box({ name, number, parentId, isSubBudgetEnabled, regionNames }); // Add regionNames
+        if (!tripId) return res.status(400).json({ error: "tripId is required" });
 
+        // If parentId is provided, ensure the parent belongs to the same trip
+        if (parentId) {
+            const parentBox = await Box.findById(parentId);
+            if (!parentBox) return res.status(404).json({ error: "Parent box not found" });
+            if (String(parentBox.tripId) !== tripId) {
+                return res.status(400).json({ error: "Parent box must belong to the same trip" });
+            }
+        }
+
+        const newBox = new Box({ name, number, parentId, isSubBudgetEnabled, regionNames, tripId });
+        console.log("newBox", newBox);
         const savedBox = await newBox.save();
 
         // If it's a child box, add it to the parent's `children` array
         if (parentId) {
             await Box.findByIdAndUpdate(parentId, { $push: { children: savedBox._id } });
+        }
+
+        // If it's a first-level box (no parent), add it to the trip's `boxes` array
+        if (!parentId) {
+            await Trip.findByIdAndUpdate(tripId, { $push: { boxes: savedBox._id } });
         }
 
         res.status(201).json(savedBox);
@@ -34,10 +57,20 @@ router.post("/boxes", async (req, res) => {
     }
 });
 
-
 // Update a box
 router.put("/boxes/:id", async (req, res) => {
     try {
+        const { tripId, parentId } = req.body;
+
+        // Ensure that the parentId (if updated) belongs to the same trip
+        if (parentId) {
+            const parentBox = await Box.findById(parentId);
+            if (!parentBox) return res.status(404).json({ error: "Parent box not found" });
+            if (tripId && String(parentBox.tripId) !== tripId) {
+                return res.status(400).json({ error: "Parent box must belong to the same trip" });
+            }
+        }
+
         const updatedBox = await Box.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(updatedBox);
     } catch (err) {
@@ -66,10 +99,14 @@ router.delete("/boxes/:id", async (req, res) => {
     }
 });
 
+// Delete all boxes for a specific trip
 router.delete("/boxes", async (req, res) => {
     try {
-        await Box.deleteMany();
-        res.json({ message: "All budgets deleted" });
+        const { tripId } = req.query;
+        if (!tripId) return res.status(400).json({ error: "tripId is required" });
+
+        await Box.deleteMany({ tripId });
+        res.json({ message: `All boxes for trip ${tripId} deleted` });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -84,6 +121,5 @@ router.patch("/boxes/:id", async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 });
-
 
 export default router;

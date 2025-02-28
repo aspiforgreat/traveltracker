@@ -8,12 +8,29 @@ const router = express.Router();
 router.get("/boxes", async (req, res) => {
     try {
         const { tripId, parentId } = req.query;
+
         if (!tripId) return res.status(400).json({ error: "tripId is required" });
 
-        const filter = { tripId };
-        if (parentId) filter.parentId = parentId;
+        // If parentId is provided, filter by parentId to get child boxes
+        if (parentId) {
+            // Fetch child boxes for this parent box
+            const boxes = await Box.find({ tripId, parentId }).populate("children");
+            return res.json(boxes);
+        }
 
-        const boxes = await Box.find(filter).populate("children");
+        // If parentId is not provided, fetch boxes associated with the trip
+        // This fetches the box IDs from the trip and then resolves them
+        const trip = await Trip.findById(tripId).populate("boxes");
+
+        // Check if the trip exists
+        if (!trip) {
+            return res.status(404).json({ error: "Trip not found" });
+        }
+
+        // Now fetch the box details for the boxes associated with the trip
+        const boxes = trip.boxes;
+
+        // Return the boxes associated with the trip
         res.json(boxes);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -45,7 +62,7 @@ router.post("/boxes", async (req, res) => {
         if (parentId) {
             await Box.findByIdAndUpdate(parentId, { $push: { children: savedBox._id } });
         }
-
+        console.log("parentId", parentId);
         // If it's a first-level box (no parent), add it to the trip's `boxes` array
         if (!parentId) {
             await Trip.findByIdAndUpdate(tripId, { $push: { boxes: savedBox._id } });

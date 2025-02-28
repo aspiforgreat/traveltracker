@@ -78,19 +78,20 @@ const SubBudgetScreen = () => {
     useEffect(() => {
         const fetchBoxes = async () => {
             try {
-                if (trip) {
-                    // If a trip is passed, fetch the first-level boxes for that trip
+                console.log("parentbox", parentBox);
+                if (parentBox) {
+                    // If parentBox exists, fetch the child boxes of that parent box
                     const response = await axios.get(baseUrl + "/api/boxes", {
-                        params: { parentId: null, tripId: trip._id }, // Fetch first-level boxes for the trip
-                    });
-                    console.log("Fetched Boxes for Trip:", response.data);
-                    setBoxes(response.data);
-                } else if (parentBox) {
-                    // If a parent box is passed, fetch its sub-boxes
-                    const response = await axios.get(baseUrl + "/api/boxes", {
-                        params: { parentId: parentBox._id },
+                        params: { parentId: parentBox._id, tripId: trip._id }, // Always pass tripId
                     });
                     console.log("Fetched Boxes for Parent Box:", response.data);
+                    setBoxes(response.data);
+                } else if (trip) {
+                    // If no parentBox, fetch the first-level boxes related to the trip
+                    const response = await axios.get(baseUrl + "/api/boxes", {
+                        params: { parentId: null, tripId: trip._id }, // Always pass tripId
+                    });
+                    console.log("Fetched Boxes for Trip:", response.data);
                     setBoxes(response.data);
                 }
             } catch (error) {
@@ -98,9 +99,10 @@ const SubBudgetScreen = () => {
                 setBoxes([]);
             }
         };
+
         fetchBoxes();
-        console.log("trip ", trip);
-    }, [trip, parentBox]); // Fetch when either trip or parentBox changes
+    }, [trip, parentBox]); // Re-run the effect when trip or parentBox changes
+
 
     const handleDragStart = (e, box) => {
         setDraggedBox(box);
@@ -150,15 +152,22 @@ const SubBudgetScreen = () => {
             // Get the tripId from the trip state or from props if it's passed down
             const tripId = trip?._id || null; // Assuming `trip` is passed via props or location state
             console.log("Adding box to trip:", tripId);
+
             const newBox = {
                 name,
                 number,
                 isSubBudgetEnabled: subbudgetEnabled,
-                parentId: parentBox?._id || null,
                 regionNames: selectedRegions,
-                tripId:  tripId, // Add the tripId here
+                tripId: tripId, // Always include tripId
             };
-            console.log("new box ", newBox);
+
+            // If there's a parentBox, associate the new box with the parent
+            if (parentBox) {
+                newBox.parentId = parentBox._id;
+            }
+
+            console.log("new box data:", newBox);
+
             // Make the request to the backend with the new box data
             const response = await axios.post(baseUrl + "/api/boxes", newBox);
 
@@ -171,12 +180,11 @@ const SubBudgetScreen = () => {
             console.error("Error adding box:", error);
         }
     };
-
     const handleBoxClick = (box) => {
         if (box.isSubBudgetEnabled) {
-            navigate("/subbudget", { state: { box } });
+            navigate("/subbudget", { state: { box, trip } });
         } else {
-            navigate("/detail", { state: { box } });
+            navigate("/detail", { state: { box, trip } });
         }
     };
 

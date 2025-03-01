@@ -80,20 +80,13 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
             {/* Budget Goal Section */}
             <Box>
                 <Typography variant="h6">Budget Goal: </Typography>
-
-                {isHomepage ? (
-                    <Button
-                        variant="outlined"
-                        onClick={handleEditClick}
-                        startIcon={<EditIcon />} // Pencil icon for edit
-                    >
-                        {parentTotal} {/* Ensure parentTotal has 'name' and 'number' */}
-                    </Button>
-                ) : (
-                    <Typography variant="h5" color="primary">
-                        {parentTotal.number} {/* Display as Typography for sub-budgets */}
-                    </Typography>
-                )}
+                <Button
+                    variant="outlined"
+                    onClick={handleEditClick}
+                    startIcon={<EditIcon />} // Pencil icon for edit
+                >
+                    {parentTotal.number}
+                </Button>
             </Box>
 
             {/* Total Sum of Boxes */}

@@ -271,7 +271,7 @@ const SubBudgetScreen = () => {
 
             <TotalDisplay
                 boxes={boxes}
-                parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal.number}
+                parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal}
                 setParentTotal={setParentTotal}
                 isHomepage={!parentData}
             />

@@ -3,6 +3,7 @@ import path from "path";
 import cors from "cors";
 import boxRoutes from "./routes/boxRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.json()); // For parsing application/json
 app.use("/api", boxRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api", tripRoutes);
+app.use("/api", statsRoutes);
 
 // Route to wipe the entire database TODO remove before prod obviously
 app.delete("/api/wipeDatabase", async (req, res) => {

@@ -69,6 +69,11 @@ const SubBudgetScreen = () => {
     const [parentTotal, setParentTotal] = useState(
         parentBox ? { number: parentBox.number } : { number: trip?.budget ?? 0 }
     );
+    const [regionsData, setRegionsData] = useState({});
+
+    // State to store the compiled (aggregated) regions for all boxes when no parentBox exists
+    const [compiledRegions, setCompiledRegions] = useState(null);
+
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
     const [draggedBox, setDraggedBox] = useState(null);
@@ -103,6 +108,47 @@ const SubBudgetScreen = () => {
         fetchBoxes();
     }, [trip, parentBox]); // Re-run the effect when trip or parentBox changes
 
+    useEffect(() => {
+
+        const fetchAndCompileAllBoxesRegions = async () => {
+            try {
+                let aggregatedRegions = {};
+                let newRegionsData = {}; // Temporary object to store fetched regions before batch updating state
+
+                for (const box of boxes) {
+                    try {
+                        const regionResponse = await axios.get(`${baseUrl}/api/regions/${box._id}`);
+                        const boxRegions = regionResponse.data.regions;
+                        console.log(`Fetched regions for box ${box.name}:`, boxRegions);
+
+                        // Aggregate region values across all boxes
+                        for (const [regionName, value] of Object.entries(boxRegions)) {
+                            aggregatedRegions[regionName] = (aggregatedRegions[regionName] || 0) + value;
+                        }
+
+                        // Store each box's individual region data temporarily
+                        newRegionsData[box._id] = { regions: boxRegions };
+                    } catch (error) {
+                        console.error(`Error fetching regions for box ${box._id}:`, error);
+                    }
+                }
+
+                // Batch update state
+                setRegionsData(prevData => ({ ...prevData, ...newRegionsData }));
+                setCompiledRegions(aggregatedRegions);
+                console.log("Compiled all regions:", aggregatedRegions);
+            } catch (error) {
+                console.error("Error fetching all boxes' region data:", error);
+            }
+        };
+
+        const fetchAndSumRegions = async () => {
+                await fetchAndCompileAllBoxesRegions();
+        };
+
+        fetchAndSumRegions();
+    }, [parentBox, trip, boxes]); // Re-run when parentBox, trip, or boxes change
+    // Re-run when parentBox, trip, or boxes change
 
     const handleDragStart = (e, box) => {
         setDraggedBox(box);

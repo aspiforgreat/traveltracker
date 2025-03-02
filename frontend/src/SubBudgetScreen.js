@@ -6,6 +6,7 @@ import AddBoxForm from "./AddBoxForm";
 import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
 import DeleteIcon from '@mui/icons-material/Delete';
+import StatsDisplay from "./StatsDisplay";
 
 const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
     return (
@@ -363,6 +364,8 @@ const SubBudgetScreen = () => {
                     </Button>
                 </Grid>
             </Grid>
+
+            <StatsDisplay stats={compiledRegions} />
 
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>

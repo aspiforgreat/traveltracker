@@ -1,61 +1,64 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, Button, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
+import { Box, Button, Card, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
 import AddBoxForm from "./AddBoxForm";
 import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
 import DeleteIcon from '@mui/icons-material/Delete';
 import StatsDisplay from "./StatsDisplay";
-
 const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
     return (
-        <Paper
-            elevation={3}
-            sx={{
-                padding: 2,
-                borderRadius: 2,
-                textAlign: "center",
-                cursor: "pointer",
-                backgroundColor: "#fff",
-                "&:hover": { backgroundColor: "#f0f0f0" },
-                position: "relative",
-            }}
-            draggable
-            onDragStart={(e) => onDragStart(e, box)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => onDrop(e, box)}
-            onClick={() => onClick(box)}
-        >
-            <Typography variant="h6">{box.name}</Typography>
-            <Typography variant="subtitle1" color="primary">
-                {box.number}
-            </Typography>
-            <Button
+        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+            {/* Main Budget Box */}
+            <Card
+                elevation={3}
                 sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    minWidth: "auto",
-                    padding: "4px",
-                    borderRadius: "50%",
-                    bgcolor: "#fff",
-                    border: "1px solid #f44336",
-                    color: "#f44336",
-                    "&:hover": {
-                        bgcolor: "#f44336",
-                        color: "#fff",
-                    },
+                    flex: 1,
+                    padding: 2,
+                    borderRadius: 2,
+                    cursor: "pointer",
+                    backgroundColor: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    height: "60px", // Ensuring a consistent height
+                    "&:hover": { backgroundColor: "#f0f0f0" },
                 }}
-                size="small"
+                draggable
+                onDragStart={(e) => onDragStart(e, box)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => onDrop(e, box)}
+                onClick={() => onClick(box)}
+            >
+                {/* Name on the left */}
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                    {box.name}
+                </Typography>
+
+                {/* Number on the right, formatted as currency */}
+                <Typography variant="h5" sx={{ fontWeight: "bold", color: "#4CAF50" }}>
+                    ${box.number.toLocaleString()}
+                </Typography>
+            </Card>
+
+            {/* Thinner Delete Bar */}
+            <Box
+                sx={{
+                    ml: 1,
+                    width: "15px", // **Truly thin now!**
+                    height: "60px", // **Same height as the box**
+                    borderRadius: 2,
+                    backgroundColor: "#f59790",
+                    cursor: "pointer",
+                    "&:hover": { backgroundColor: "#d32f2f" },
+                }}
                 onClick={(e) => {
                     e.stopPropagation();
                     onDelete(box);
                 }}
-            >
-                <DeleteIcon fontSize="small" />
-            </Button>
-        </Paper>
+            />
+        </Box>
     );
 };
 
@@ -327,12 +330,12 @@ const SubBudgetScreen = () => {
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                {parentData ? "Sub-Boxes" : "Countries"}
+                {parentData ? "Stops" : "Stops"}
             </Typography>
 
-            <Grid container spacing={2} justifyContent="center">
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}>
                 {boxes.map((box) => (
-                    <Grid item xs={12} sm={4} md={3} key={box._id}>
+                    <Box key={box._id} sx={{ width: "100%" }}>
                         <DraggableBox
                             box={box}
                             onDragStart={handleDragStart}
@@ -340,19 +343,17 @@ const SubBudgetScreen = () => {
                             onClick={handleBoxClick}
                             onDelete={handleDeleteBox}
                         />
-                    </Grid>
+                    </Box>
                 ))}
 
-                <Grid item xs={12} sm={4} md={3}>
-                    <Button
-                        variant="contained"
-                        sx={{ width: "100%", height: "100%", borderRadius: 2 }}
-                        onClick={() => setShowAddModal(true)}
-                    >
-                        +
-                    </Button>
-                </Grid>
-            </Grid>
+                <Button
+                    variant="contained"
+                    sx={{ width: "100%", borderRadius: 2, height: "50px" }}
+                    onClick={() => setShowAddModal(true)}
+                >
+                    +
+                </Button>
+            </Box>
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}> Stats </Typography>
             <StatsDisplay stats={compiledRegions} />

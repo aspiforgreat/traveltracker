@@ -365,6 +365,7 @@ const SubBudgetScreen = () => {
                 </Grid>
             </Grid>
 
+            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}> Stats </Typography>
             <StatsDisplay stats={compiledRegions} />
 
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>

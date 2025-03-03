@@ -7,6 +7,9 @@ import TotalDisplay from "./TotalDisplay";
 import MultiSliderBar from "./MultiSliderBar";
 import DeleteIcon from '@mui/icons-material/Delete';
 import StatsDisplay from "./StatsDisplay";
+
+import "./SubBudgetScreen.css";
+import {Spacer} from "@chakra-ui/react";
 const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
     return (
         <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
@@ -22,8 +25,9 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    height: "60px", // Ensuring a consistent height
+                    height: "80px", // Ensuring a consistent height
                     "&:hover": { backgroundColor: "#f0f0f0" },
+                    paddingBottom : "8px",
                 }}
                 draggable
                 onDragStart={(e) => onDragStart(e, box)}
@@ -52,6 +56,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     backgroundColor: "#f59790",
                     cursor: "pointer",
                     "&:hover": { backgroundColor: "#d32f2f" },
+
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
@@ -77,6 +82,7 @@ const SubBudgetScreen = () => {
 
     // State to store the compiled (aggregated) regions for all boxes when no parentBox exists
     const [compiledRegions, setCompiledRegions] = useState(null);
+    const [connections, setConnections] = useState({});
 
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -333,9 +339,94 @@ const SubBudgetScreen = () => {
                 {parentData ? "Stops" : "Stops"}
             </Typography>
 
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}>
-                {boxes.map((box) => (
-                    <Box key={box._id} sx={{ width: "100%" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", paddingTop: "8px" }}>
+                {/* First Input Field (Before First Box) */}
+                <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2,}}>
+                    <TextField
+                        type="number"
+                        variant="outlined"
+                        size="small"
+                        placeholder="Arrival cost"
+                        sx={{
+                            width: 80,
+                            height: 30,
+                            textAlign: "center",
+                            backgroundColor: "white",
+                            borderRadius: 1,
+                            "& fieldset": { border: "none" },
+                            "& input": {
+                                textAlign: "center",
+                                fontSize: "16px",
+                                padding: "5px 0",
+                                MozAppearance: "textfield",
+                                "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+                                    WebkitAppearance: "none",
+                                    margin: 0,
+                                },
+                            },
+                        }}
+                        value={connections["first"] || ""}
+                        onChange={(e) => setConnections({ ...connections, first: e.target.value })}
+                    />
+                    {/* Downward Arrow (No Top Line) */}
+                    <Box className="arrow-container"> {/* Apply the custom class here */}
+                        <Box className="arrow-box" />
+                    </Box>
+                </Box>
+
+                {boxes.map((box, index) => (
+                    <React.Fragment key={box._id}>
+                        {index !== 0 && (
+                            <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column",paddingTop:"10px", mb: 2 }}>
+                                {/* Light Gray Top Line */}
+                                <Box sx={{ width: 2, height: 20, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
+
+                                {/* Input Field */}
+                                <TextField
+                                    type="number"
+                                    variant="outlined"
+                                    size="small"
+                                    placeholder="Arrival cost"
+                                    sx={{
+                                        width: 80,
+                                        height: 30,
+                                        textAlign: "center",
+                                        backgroundColor: "white",
+                                        borderRadius: 1,
+                                        "& fieldset": { border: "none" },
+                                        "& input": {
+                                            textAlign: "center",
+                                            fontSize: "16px",
+                                            padding: "5px 0",
+                                            MozAppearance: "textfield",
+                                            "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+                                                WebkitAppearance: "none",
+                                                margin: 0,
+                                            },
+                                        },
+                                    }}
+                                    value={connections[box._id] || ""}
+                                    onChange={(e) => setConnections({ ...connections, [box._id]: e.target.value })}
+                                />
+
+                                {/* Light Gray Bottom Line with Arrow */}
+                                <Box sx={{ width: 2, height: 20, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            left: "50%",
+                                            transform: "translateX(-50%)",
+                                            top: 20,
+                                            borderLeft: "6px solid transparent",
+                                            borderRight: "6px solid transparent",
+                                            borderTop: "8px solid #ccc",
+                                            paddingBottom: "8px",
+                                        }}
+                                    />
+                                </Box>
+                            </Box>
+                        )}
+
                         <DraggableBox
                             box={box}
                             onDragStart={handleDragStart}
@@ -343,16 +434,8 @@ const SubBudgetScreen = () => {
                             onClick={handleBoxClick}
                             onDelete={handleDeleteBox}
                         />
-                    </Box>
+                    </React.Fragment>
                 ))}
-
-                <Button
-                    variant="contained"
-                    sx={{ width: "100%", borderRadius: 2, height: "50px" }}
-                    onClick={() => setShowAddModal(true)}
-                >
-                    +
-                </Button>
             </Box>
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}> Stats </Typography>

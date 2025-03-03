@@ -321,21 +321,10 @@ const SubBudgetScreen = () => {
                 parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal}
                 setParentTotal={setParentTotal}
                 isHomepage={!parentData}
+                onRedistribute={handleRedistribute}  // Pass the function as a prop
             />
 
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
-
-            {/* --- New: Redistribute Budget button --- */}
-            <Box sx={{ mt: 2, textAlign: "center" }}>
-                <Button
-                    variant="contained"
-                    onClick={handleRedistribute}
-                    disabled={!(parentData ? parentData.number > 0 : parentTotal.number > 0)}
-                >
-                    Redistribute Budget
-                </Button>
-            </Box>
-            {/* --- End new button --- */}
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
                 {parentData ? "Sub-Boxes" : "Countries"}

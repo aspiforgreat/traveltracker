@@ -7,7 +7,7 @@ const calculateTotal = (boxes) => {
     return boxes.reduce((total, box) => total + box.number, 0);
 };
 
-const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
+const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedistribute }) => {
     const [userTotal, setUserTotal] = useState(parentTotal.number);  // Initialize userTotal with parent's number
     const [showModal, setShowModal] = useState(false);
 
@@ -110,6 +110,15 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage }) => {
                         {(isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum}
                     </Typography>
                 </CardContent>
+                <CardActions>
+                    <Button
+                        variant="outlined"
+                        onClick={onRedistribute}
+                        fullWidth
+                    >
+                        Redistribute
+                    </Button>
+                </CardActions>
             </Card>
 
             {/* Modal for Editing User Total */}

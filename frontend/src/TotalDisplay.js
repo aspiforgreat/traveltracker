@@ -12,7 +12,9 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
     const [showModal, setShowModal] = useState(false);
 
     const totalBoxSum = calculateTotal(boxes);
-    const differenceColor = userTotal - totalBoxSum >= 0 ? "green" : "red";
+    const difference = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum
+    const differenceString = difference >= 0 ? `+${difference}` : difference;
+    const differenceColor = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum >= 0 ? "green":"red";
 
     const handleEditClick = () => {
         setShowModal(true);
@@ -101,8 +103,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                     <Box display="inline-flex" alignItems="center" gap={1}>
                         <Typography variant="h5" color="primary">{totalBoxSum}</Typography>
                         <Typography variant="h5" color={differenceColor}>
-                            {differenceColor === "green" ? " + " : " - "}
-                            {(isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum}
+                            {differenceString}
                         </Typography>
                     </Box>
                 </CardContent>

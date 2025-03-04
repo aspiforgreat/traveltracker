@@ -77,7 +77,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
         <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mb: 3 }}>
 
             {/* Budget Goal Card */}
-            <Card sx={{ width: 300 }}>
+            <Card sx={{ width: 500 }}>
                 <CardContent>
                     <Typography variant="h6" gutterBottom>Budget Goal</Typography>
                     <Typography variant="h5" color="primary">{parentTotal.number}</Typography>
@@ -95,20 +95,16 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
             </Card>
 
             {/* Total Allocated Card */}
-            <Card sx={{ width: 300 }}>
+            <Card sx={{ width: 500 }}>
                 <CardContent>
                     <Typography variant="h6" gutterBottom>Total Allocated</Typography>
-                    <Typography variant="h5" color="primary">{totalBoxSum}</Typography>
-                </CardContent>
-            </Card>
-
-            {/* Difference Card */}
-            <Card sx={{ width: 300 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>Difference</Typography>
-                    <Typography variant="h5" color={differenceColor}>
-                        {(isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum}
-                    </Typography>
+                    <Box display="inline-flex" alignItems="center" gap={1}>
+                        <Typography variant="h5" color="primary">{totalBoxSum}</Typography>
+                        <Typography variant="h5" color={differenceColor}>
+                            {differenceColor === "green" ? " + " : " - "}
+                            {(isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum}
+                        </Typography>
+                    </Box>
                 </CardContent>
                 <CardActions>
                     <Button
@@ -116,10 +112,21 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                         onClick={onRedistribute}
                         fullWidth
                     >
-                        Redistribute
+                        Fit Goal
                     </Button>
                 </CardActions>
             </Card>
+
+            {/* Difference Card
+            <Card sx={{ width: 300 }}>
+                <CardContent>
+                    <Typography variant="h6" gutterBottom>Difference</Typography>
+                    <Typography variant="h5" color={differenceColor}>
+                        {(isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum}
+                    </Typography>
+                </CardContent>
+            </Card>
+            */}
 
             {/* Modal for Editing User Total */}
             <Modal open={showModal} onClose={handleCloseModal}>

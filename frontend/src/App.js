@@ -1,9 +1,9 @@
 // App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SubBudgetScreenWrapper from "./SubBudgetScreenWrapper";
-import DetailPage from "./DetailPage";
-import TripScreen from "./TripScreen";
+import SubBudgetScreenWrapper from "./Screens/SubBudgetScreenWrapper";
+import DetailPage from "./Screens/DetailPage";
+import TripScreen from "./Screens/TripScreen";
 
 const App = () => (
     <Router>

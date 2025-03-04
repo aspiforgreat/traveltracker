@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Card, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
-import AddBoxForm from "./AddBoxForm";
-import TotalDisplay from "./TotalDisplay";
-import MultiSliderBar from "./MultiSliderBar";
+import AddBoxForm from "../Components/AddBoxForm";
+import TotalDisplay from "../Components/TotalDisplay";
+import MultiSliderBar from "../Components/MultiSliderBar";
 import DeleteIcon from '@mui/icons-material/Delete';
-import StatsDisplay from "./StatsDisplay";
+import StatsDisplay from "../Components/StatsDisplay";
 
 import "./SubBudgetScreen.css";
 import {Spacer} from "@chakra-ui/react";
@@ -339,7 +339,7 @@ const SubBudgetScreen = () => {
                 {parentData ? "Stops" : "Stops"}
             </Typography>
 
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", paddingTop: "8px" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                 {/* First Input Field (Before First Box) */}
                 <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2,}}>
                     <TextField
@@ -349,7 +349,7 @@ const SubBudgetScreen = () => {
                         placeholder="Arrival cost"
                         sx={{
                             width: 80,
-                            height: 30,
+                            height: 20,
                             textAlign: "center",
                             backgroundColor: "white",
                             borderRadius: 1,
@@ -357,7 +357,7 @@ const SubBudgetScreen = () => {
                             "& input": {
                                 textAlign: "center",
                                 fontSize: "16px",
-                                padding: "5px 0",
+                                padding: "1px 0",
                                 MozAppearance: "textfield",
                                 "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
                                     WebkitAppearance: "none",
@@ -379,7 +379,7 @@ const SubBudgetScreen = () => {
                         {index !== 0 && (
                             <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column",paddingTop:"10px", mb: 2 }}>
                                 {/* Light Gray Top Line */}
-                                <Box sx={{ width: 2, height: 20, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
+                                <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
 
                                 {/* Input Field */}
                                 <TextField
@@ -389,7 +389,7 @@ const SubBudgetScreen = () => {
                                     placeholder="Arrival cost"
                                     sx={{
                                         width: 80,
-                                        height: 30,
+                                        height: 20,
                                         textAlign: "center",
                                         backgroundColor: "white",
                                         borderRadius: 1,
@@ -397,7 +397,7 @@ const SubBudgetScreen = () => {
                                         "& input": {
                                             textAlign: "center",
                                             fontSize: "16px",
-                                            padding: "5px 0",
+                                            padding: "1px 0",
                                             MozAppearance: "textfield",
                                             "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
                                                 WebkitAppearance: "none",
@@ -410,13 +410,13 @@ const SubBudgetScreen = () => {
                                 />
 
                                 {/* Light Gray Bottom Line with Arrow */}
-                                <Box sx={{ width: 2, height: 20, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
+                                <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
                                     <Box
                                         sx={{
                                             position: "absolute",
                                             left: "50%",
                                             transform: "translateX(-50%)",
-                                            top: 20,
+                                            top: 10,
                                             borderLeft: "6px solid transparent",
                                             borderRight: "6px solid transparent",
                                             borderTop: "8px solid #ccc",
@@ -436,6 +436,15 @@ const SubBudgetScreen = () => {
                         />
                     </React.Fragment>
                 ))}
+                <Box sx={{ width: "100%", borderRadius: 2, height: "50px" , padding:"20px"}}>
+                <Button
+                    variant="contained"
+                    sx={{ width: "100%", borderRadius: 2, height: "50px" , padding:"20px"}}
+                    onClick={() => setShowAddModal(true)}
+                >
+                    +
+                </Button>
+                </Box>
             </Box>
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}> Stats </Typography>

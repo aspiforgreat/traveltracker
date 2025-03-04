@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Card, Container, Grid, Paper, Typography, Modal, TextField } from "@mui/material";
 import AddBoxForm from "../Components/AddBoxForm";
 import TotalDisplay from "../Components/TotalDisplay";
+import ArrivalCostInput from "../Components/ArrivalCostInput";
 import MultiSliderBar from "../Components/MultiSliderBar";
 import DeleteIcon from '@mui/icons-material/Delete';
 import StatsDisplay from "../Components/StatsDisplay";
@@ -342,31 +343,11 @@ const SubBudgetScreen = () => {
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                 {/* First Input Field (Before First Box) */}
                 <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2,}}>
-                    <TextField
-                        type="number"
-                        variant="outlined"
-                        size="small"
-                        placeholder="Arrival cost"
-                        sx={{
-                            width: 80,
-                            height: 20,
-                            textAlign: "center",
-                            backgroundColor: "white",
-                            borderRadius: 1,
-                            "& fieldset": { border: "none" },
-                            "& input": {
-                                textAlign: "center",
-                                fontSize: "16px",
-                                padding: "1px 0",
-                                MozAppearance: "textfield",
-                                "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
-                                    WebkitAppearance: "none",
-                                    margin: 0,
-                                },
-                            },
-                        }}
-                        value={connections["first"] || ""}
-                        onChange={(e) => setConnections({ ...connections, first: e.target.value })}
+                    <ArrivalCostInput
+                        id={boxes[0 ]?._id  ?? null }// Unique identifier for each input field
+                        previousBoxId={null}  // Previous box ID
+                        nextBoxId={boxes[0 ]?._id ?? null } // Current box ID (as next box)
+                        tripId={trip?._id ?? null}
                     />
                     {/* Downward Arrow (No Top Line) */}
                     <Box className="arrow-container"> {/* Apply the custom class here */}
@@ -382,33 +363,14 @@ const SubBudgetScreen = () => {
                                 <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
 
                                 {/* Input Field */}
-                                <TextField
-                                    type="number"
-                                    variant="outlined"
-                                    size="small"
-                                    placeholder="Arrival cost"
-                                    sx={{
-                                        width: 80,
-                                        height: 20,
-                                        textAlign: "center",
-                                        backgroundColor: "white",
-                                        borderRadius: 1,
-                                        "& fieldset": { border: "none" },
-                                        "& input": {
-                                            textAlign: "center",
-                                            fontSize: "16px",
-                                            padding: "1px 0",
-                                            MozAppearance: "textfield",
-                                            "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
-                                                WebkitAppearance: "none",
-                                                margin: 0,
-                                            },
-                                        },
-                                    }}
-                                    value={connections[box._id] || ""}
-                                    onChange={(e) => setConnections({ ...connections, [box._id]: e.target.value })}
-                                />
+                                <ArrivalCostInput
+                                    id={box._id}  // Unique identifier for each input field
+                                    previousBoxId={boxes[index-1 ]._id }  // Previous box ID
+                                    nextBoxId={box._id } // Current box ID (as next box)
+                                    tripId={trip?._id ?? null}
 
+                                />
+                                { console.log("box",box)}
                                 {/* Light Gray Bottom Line with Arrow */}
                                 <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
                                     <Box

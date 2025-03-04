@@ -13,7 +13,9 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
 
     const totalBoxSum = calculateTotal(boxes);
     const difference = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum
-    const differenceString = difference >= 0 ? `+${difference}` : difference;
+    const differenceString = Math.abs(difference) < 2 ? "" : difference >= 0 ? `+${difference}` : `${difference}`;
+
+
     const differenceColor = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum >= 0 ? "green":"red";
 
     const handleEditClick = () => {

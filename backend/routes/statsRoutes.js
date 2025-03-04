@@ -7,9 +7,9 @@ const router = express.Router();
 const calculateRegionValues = (regions, handles, number) => {
     let regionValues = {};
     let previousHandle = 0;
-    let remainingPercentage = 100;
+    let totalPercentage = 0; // Track the total percentage covered by the regions
 
-    for (let i = 0; i < regions.length; i++) {
+    for (let i = 0; i < regions.length - 1; i++) {
         const region = regions[i];
         const currentHandle = handles[i];
 
@@ -19,18 +19,25 @@ const calculateRegionValues = (regions, handles, number) => {
 
         // Assign value to the region
         regionValues[region] = regionValue;
+
+        totalPercentage += regionPercentage; // Add to the total percentage
         previousHandle = currentHandle;
     }
 
+    // Calculate the remaining percentage for the last region
+    const remainingPercentage = 100 - totalPercentage;
+
     // The last region takes the remaining percentage
     regionValues[regions[regions.length - 1]] = Math.round((remainingPercentage / 100) * number);
+
     return regionValues;
 };
 
 // Recursive function to gather the regions for a box and its children
 const getBoxRegions = async (boxId) => {
+    // Fetch the box by its ID, populate the 'children' field with its sub-boxes
     const box = await Box.findById(boxId)
-        .populate('children') // populate the children field
+        .populate('children') // Ensure the children are populated
         .exec();
 
     if (!box) {
@@ -51,10 +58,11 @@ const getBoxRegions = async (boxId) => {
     };
 
     // If the box has children, recursively get regions for them
-    if (box.children.length > 0) {
+    if (box.children && box.children.length > 0) {
         result.children = [];
-        for (const childId of box.children) {
-            const childRegionData = await getBoxRegions(childId);
+        for (const child of box.children) {
+            // Recursively call the function for each child
+            const childRegionData = await getBoxRegions(child._id); // Recursively process child
             result.children.push(childRegionData);
         }
     }

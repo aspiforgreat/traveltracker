@@ -1,6 +1,6 @@
 import express from "express";
 import Box from "../models/Box.js";
-import  Trip from "../models/Trip.js";
+import Trip from "../models/Trip.js";
 
 const router = express.Router();
 
@@ -13,13 +13,12 @@ router.get("/boxes", async (req, res) => {
 
         // If parentId is provided, filter by parentId to get child boxes
         if (parentId) {
-            // Fetch child boxes for this parent box
-            const boxes = await Box.find({ tripId, parentId }).populate("children");
+            // Fetch child boxes for this parent box and sort them by startDate
+            const boxes = await Box.find({ tripId, parentId }).populate("children").sort({ startDate: 1 });
             return res.json(boxes);
         }
 
         // If parentId is not provided, fetch boxes associated with the trip
-        // This fetches the box IDs from the trip and then resolves them
         const trip = await Trip.findById(tripId).populate("boxes");
 
         // Check if the trip exists
@@ -27,21 +26,20 @@ router.get("/boxes", async (req, res) => {
             return res.status(404).json({ error: "Trip not found" });
         }
 
-        // Now fetch the box details for the boxes associated with the trip
-        const boxes = trip.boxes;
+        // Sort the boxes by startDate (ascending order)
+        const sortedBoxes = trip.boxes.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-        // Return the boxes associated with the trip
-        res.json(boxes);
+        // Return the sorted boxes associated with the trip
+        res.json(sortedBoxes);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
 // Create a new box
-
 router.post("/boxes", async (req, res) => {
     try {
-        const { name, number, parentId, isSubBudgetEnabled, regionNames, tripId } = req.body;
+        const { name, number, parentId, isSubBudgetEnabled, regionNames, tripId, startDate, endDate } = req.body;
 
         if (!tripId) return res.status(400).json({ error: "tripId is required" });
 
@@ -54,15 +52,24 @@ router.post("/boxes", async (req, res) => {
             }
         }
 
-        const newBox = new Box({ name, number, parentId, isSubBudgetEnabled, regionNames, tripId });
-        console.log("newBox", newBox);
+        const newBox = new Box({
+            name,
+            number,
+            parentId,
+            isSubBudgetEnabled,
+            regionNames,
+            tripId,
+            startDate,  // Add startDate
+            endDate     // Add endDate
+        });
+
         const savedBox = await newBox.save();
 
         // If it's a child box, add it to the parent's `children` array
         if (parentId) {
             await Box.findByIdAndUpdate(parentId, { $push: { children: savedBox._id } });
         }
-        console.log("parentId", parentId);
+
         // If it's a first-level box (no parent), add it to the trip's `boxes` array
         if (!parentId) {
             await Trip.findByIdAndUpdate(tripId, { $push: { boxes: savedBox._id } });
@@ -77,7 +84,7 @@ router.post("/boxes", async (req, res) => {
 // Update a box
 router.put("/boxes/:id", async (req, res) => {
     try {
-        const { tripId, parentId } = req.body;
+        const { tripId, parentId, startDate, endDate } = req.body;
 
         // Ensure that the parentId (if updated) belongs to the same trip
         if (parentId) {
@@ -88,7 +95,7 @@ router.put("/boxes/:id", async (req, res) => {
             }
         }
 
-        const updatedBox = await Box.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedBox = await Box.findByIdAndUpdate(req.params.id, { startDate, endDate, ...req.body }, { new: true });
         res.json(updatedBox);
     } catch (err) {
         res.status(400).json({ error: err.message });

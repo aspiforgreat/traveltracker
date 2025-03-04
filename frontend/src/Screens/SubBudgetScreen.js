@@ -117,6 +117,7 @@ const SubBudgetScreen = () => {
         };
 
         fetchBoxes();
+
     }, [trip, parentBox]); // Re-run the effect when trip or parentBox changes
 
     useEffect(() => {
@@ -204,7 +205,7 @@ const SubBudgetScreen = () => {
         }
     };
 
-    const handleAddBox = async (name, number, subbudgetEnabled, selectedRegions) => {
+    const handleAddBox = async (name, number, subbudgetEnabled, selectedRegions, startDate, endDate) => {
         try {
             // Get the tripId from the trip state or from props if it's passed down
             const tripId = trip?._id || null; // Assuming `trip` is passed via props or location state
@@ -216,6 +217,8 @@ const SubBudgetScreen = () => {
                 isSubBudgetEnabled: subbudgetEnabled,
                 regionNames: selectedRegions,
                 tripId: tripId, // Always include tripId
+                startDate, // Add the start date
+                endDate,   // Add the end date
             };
 
             // If there's a parentBox, associate the new box with the parent
@@ -370,7 +373,7 @@ const SubBudgetScreen = () => {
                                     tripId={trip?._id ?? null}
 
                                 />
-                                { console.log("box",box)}
+
                                 {/* Light Gray Bottom Line with Arrow */}
                                 <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
                                     <Box

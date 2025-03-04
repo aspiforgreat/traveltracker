@@ -9,7 +9,9 @@ const BoxSchema = new mongoose.Schema({
     tripId: { type: mongoose.Schema.Types.ObjectId, ref: "Trip", required: true, index: true },
     handles: { type: [Number], default: [] },
     regionNames: { type: [String], default: [""] },
-    regionColors: { type: [String], default: [] }
+    regionColors: { type: [String], default: [] },
+    startDate: { type: Date, required: true },  // New startDate field
+    endDate: { type: Date, required: true }     // New endDate field
 });
 
 // Indexes for performance optimization

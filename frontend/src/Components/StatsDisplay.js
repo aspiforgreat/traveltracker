@@ -8,12 +8,10 @@ const StatsDisplay = ({ stats }) => {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-            {Object.entries(stats).map(([key, value]) => {
+            {Object.entries(stats)
+                .filter(([key]) => key !== "undefined")
+                .map(([key, value]) => {
                 let name = key;
-                if (name === "undefined") {
-                    name = "Miscellaneous";
-                }
-
                 return (
                     <div key={name} className="p-4 rounded-2xl shadow-md bg-white text-center">
                         <h3 className="text-lg font-semibold capitalize">{name}</h3>

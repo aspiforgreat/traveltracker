@@ -5,7 +5,7 @@ const TransportCostConnectionSchema = new mongoose.Schema({
     number: { type: Number, required: true }, // The transport cost amount
     tripId: { type: mongoose.Schema.Types.ObjectId, ref: "Trip", required: true, index: true }, // Reference to the Trip
     fromBox: { type: mongoose.Schema.Types.ObjectId, ref: "Box", required: false }, // Reference to the 'from' box
-    toBox: { type: mongoose.Schema.Types.ObjectId, ref: "Box", required: true }, // Reference to the 'to' box
+    toBox: { type: mongoose.Schema.Types.ObjectId, ref: "Box", required: false }, // Reference to the 'to' box
 });
 
 // Indexes for performance optimization

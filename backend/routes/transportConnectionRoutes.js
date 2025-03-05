@@ -5,25 +5,33 @@ import TransportCostConnection from "../models/TransportCostConnection.js"; // A
 const router = express.Router();
 
 // Create or update a transport cost connection based on the toBoxId and fromBox
-router.post("/transport-cost-connections/:toBoxId", async (req, res) => {
+router.post("/transport-cost-connections/:toBoxId?", async (req, res) => {
     try {
         const { number, tripId, fromBox } = req.body;
-        const { toBoxId } = req.params; // Get the toBoxId from the URL parameter
+        let { toBoxId } = req.params; // Get the toBoxId from the URL parameter
 
-        // Try to find an existing connection with the given fromBox and toBox
-        const existingConnection = await TransportCostConnection.findOne({ fromBox, toBox: toBoxId });
+        // If toBoxId is null or "null", use fromBox instead
+        if (!toBoxId || toBoxId === "null") {
+            toBoxId = null;
+        }
+
+        // Determine query condition based on available IDs
+        const query = toBoxId ? { fromBox, toBox: toBoxId } : { fromBox };
+
+        // Try to find an existing connection
+        let existingConnection = await TransportCostConnection.findOne(query);
 
         if (existingConnection) {
-            // If the connection exists, update it
+            // Update existing connection
             existingConnection.number = number;
             existingConnection.tripId = tripId;
             existingConnection.fromBox = fromBox;
             existingConnection.toBox = toBoxId;
 
             const updatedConnection = await existingConnection.save();
-            return res.json(updatedConnection);  // Return the updated connection
+            return res.json(updatedConnection); // Return the updated connection
         } else {
-            // If no existing connection, create a new one
+            // Create a new connection
             const newConnection = new TransportCostConnection({
                 number,
                 tripId,
@@ -32,27 +40,46 @@ router.post("/transport-cost-connections/:toBoxId", async (req, res) => {
             });
 
             const savedConnection = await newConnection.save();
-            return res.status(201).json(savedConnection);  // Return the newly created connection
+            return res.status(201).json(savedConnection); // Return the newly created connection
         }
     } catch (err) {
-        res.status(400).json({ error: err.message });  // Handle any error
+        res.status(400).json({ error: err.message }); // Handle any errors
     }
 });
 
+
 // Get all transport cost connections for a specific toBox
-router.get("/transport-cost-connections/:toBoxId", async (req, res) => {
+router.get("/transport-cost-connections/:fromBoxId?/:toBoxId?", async (req, res) => {
     try {
-        const toBoxId = req.params.toBoxId;
-        const toBoxObjectId = new mongoose.Types.ObjectId(toBoxId);
-        if(!toBoxObjectId) {
-            return res.status(404).json({ error: "No connection found for the given toBox ID" });
+        let { fromBoxId, toBoxId } = req.params;
+
+        // If both are null or undefined, return an error
+        if ((!fromBoxId || fromBoxId === "null" || fromBoxId === "undefined") &&
+            (!toBoxId || toBoxId === "null" || toBoxId === "undefined")) {
+            return res.status(400).json({ error: "Either fromBoxId or toBoxId must be provided." });
         }
-        const connection = await TransportCostConnection.findOne({ toBox: toBoxObjectId });
+
+        let query = {};
+
+        if (toBoxId && toBoxId !== "null" && toBoxId !== "undefined") {
+            if (!mongoose.Types.ObjectId.isValid(toBoxId)) {
+                return res.status(400).json({ error: "Invalid toBoxId" });
+            }
+            query.toBox = new mongoose.Types.ObjectId(toBoxId);
+        } else if (fromBoxId && fromBoxId !== "null" && fromBoxId !== "undefined") {
+            if (!mongoose.Types.ObjectId.isValid(fromBoxId)) {
+                return res.status(400).json({ error: "Invalid fromBoxId" });
+            }
+            query.fromBox = new mongoose.Types.ObjectId(fromBoxId);
+        }
+
+        const connection = await TransportCostConnection.findOne(query);
 
         if (!connection) {
-            console.log("No connection found in database for:", toBoxObjectId);
-            return res.status(404).json({ error: "No connection found for the given toBox ID" });
+            console.log("No connection found in database for:", query);
+            return res.status(404).json({ error: "No connection found for the given IDs" });
         }
+
         res.json(connection);
     } catch (err) {
         console.error("Error fetching transport cost connection:", err);
@@ -60,7 +87,9 @@ router.get("/transport-cost-connections/:toBoxId", async (req, res) => {
     }
 });
 
-router.get("/transport-cost-connections", async (req, res) => {
+
+
+router.get("/transport-cost-connections-all", async (req, res) => {
     try {
         const connections = await TransportCostConnection.find({});
         res.json(connections);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 
-const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange }) => {
+const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange, placeholder = "Arrival cost" }) => {
     const [value, setValue] = useState("");
     const baseUrl = "http://localhost:8000";
 
@@ -9,7 +9,8 @@ const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange }) =>
         // Fetch initial value when the component mounts
         const fetchInitialValue = async (id) => {
             try {
-                const response = await fetch(`${baseUrl}/api/transport-cost-connections/${nextBoxId}`);
+                console.log("fetching initial value for", nextBoxId, previousBoxId, placeholder);
+                const response = await fetch(`${baseUrl}/api/transport-cost-connections/${previousBoxId}/${nextBoxId}`);
                 if (!response.ok) throw new Error("Failed to fetch");
                 const data = await response.json();
                 setValue(data.number);
@@ -69,9 +70,9 @@ const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange }) =>
             type="number"
             variant="outlined"
             size="small"
-            placeholder="Arrival cost"
+            placeholder={placeholder}
             sx={{
-                width: 80,
+                width: 150,
                 height: 20,
                 textAlign: "center",
                 backgroundColor: "white",

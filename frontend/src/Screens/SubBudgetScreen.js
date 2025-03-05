@@ -411,6 +411,7 @@ const SubBudgetScreen = () => {
                         nextBoxId={boxes[0 ]?._id ?? null } // Current box ID (as next box)
                         tripId={trip?._id ?? null}
                         onChange={handleArrivalCostChange}
+                        placeholder={"Departure/Round Trip cost"}
                     />
                     {/* Downward Arrow (No Top Line) */}
                     <Box className="arrow-container"> {/* Apply the custom class here */}
@@ -461,6 +462,22 @@ const SubBudgetScreen = () => {
                         />
                     </React.Fragment>
                 ))}
+
+                <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2, paddingTop:"10px"}}>
+                {/* Light Gray Top Line */}
+                    <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
+                    {boxes.length > 0 ? (
+                        <ArrivalCostInput
+                            id={boxes[boxes.length - 1]._id} // Last box ID
+                            previousBoxId={boxes[boxes.length - 1]._id} // Same as last box ID
+                            nextBoxId={null} // Next box ID is null
+                            tripId={trip?._id ?? null}
+                            onChange={handleArrivalCostChange}
+                            placeholder={"Return cost"}
+                        />
+                    ) : null}
+                </Box>
+
                 <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 2 }}>
                     <Button
                         variant="contained"
@@ -496,7 +513,7 @@ const SubBudgetScreen = () => {
                 Stats
             </Typography>
             <div className="p-6">
-                <StatsDisplay stats={compiledRegions} />
+                <StatsDisplay stats={{ ...compiledRegions, "Travel Costs": totalArrivalCost }} />
             </div>
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>

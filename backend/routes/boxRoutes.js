@@ -9,6 +9,12 @@ router.get("/boxes", async (req, res) => {
     try {
         const { tripId, parentId } = req.query;
 
+        // If neither tripId nor parentId is provided, fetch all boxes sorted by startDate
+        if (!tripId && !parentId) {
+            const allBoxes = await Box.find().sort({ startDate: 1 });
+            return res.json(allBoxes);
+        }
+
         if (!tripId) return res.status(400).json({ error: "tripId is required" });
 
         // If parentId is provided, filter by parentId to get child boxes

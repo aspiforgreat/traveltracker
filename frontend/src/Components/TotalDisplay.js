@@ -16,7 +16,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
     const differenceString = Math.abs(difference) < 2 ? "" : difference >= 0 ? `+${difference}` : `${difference}`;
 
 
-    const differenceColor = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum >= 0 ? "green":"red";
+    const differenceColor = difference >= 0 ? "green":"red";
 
     const handleEditClick = () => {
         setShowModal(true);
@@ -100,28 +100,59 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
 
             {/* Total Allocated Card */}
             <Card sx={{ width: 500 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>Total Allocated</Typography>
-                    <Box display="inline-flex" alignItems="center" gap={1}>
-                        <Typography variant="h5" color="primary">{totalBoxSum}</Typography>
-                        <Typography variant="h5" color={"blue"}>
-                            {`+${arrivalCost}`}
+            <CardContent>
+                {/* Using Radix UI Box with flexbox for layout */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        gap: 3,  // Space between columns
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                    }}
+                >
+                    {/* Total Allocated Column */}
+                    <Box sx={{ flex: 1, textAlign: 'center' }}>
+                        <Typography variant="h6">
+                            Allocated
                         </Typography>
-                        <Typography variant="h5" color={differenceColor}>
-                            {differenceString}
+                        <Typography variant="h5" color="primary">
+                            {totalBoxSum}
                         </Typography>
                     </Box>
-                </CardContent>
-                <CardActions>
-                    <Button
-                        variant="outlined"
-                        onClick={onRedistribute}
-                        fullWidth
-                    >
-                        Fit Goal
-                    </Button>
-                </CardActions>
-            </Card>
+
+                    {/* Travel Costs Column */}
+                    <Box sx={{ flex: 1, textAlign: 'center' }}>
+                        <Typography variant="h6">
+                            Travel Costs
+                        </Typography>
+                        <Typography variant="h5" color="blue">
+                            {`+${arrivalCost}`}
+                        </Typography>
+                    </Box>
+
+                    {/* Difference Column */}
+                    {differenceString !== "" && (
+                    <Box sx={{ flex: 1, textAlign: 'center' }}>
+                        <Typography variant="h6" >
+                            Difference
+                        </Typography>
+
+                            <Typography variant="h5" color={differenceColor}>
+                                {differenceString}
+                            </Typography>
+
+                    </Box>
+                    )}
+                </Box>
+            </CardContent>
+
+            <CardActions>
+                <Button variant="outlined" onClick={onRedistribute} fullWidth>
+                    Fit Goal
+                </Button>
+            </CardActions>
+        </Card>
 
             {/* Difference Card
             <Card sx={{ width: 300 }}>

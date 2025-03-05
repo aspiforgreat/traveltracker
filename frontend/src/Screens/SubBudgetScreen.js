@@ -7,6 +7,8 @@ import TotalDisplay from "../Components/TotalDisplay";
 import ArrivalCostInput from "../Components/ArrivalCostInput";
 import MultiSliderBar from "../Components/MultiSliderBar";
 import StatsDisplay from "../Components/StatsDisplay";
+import CardWrapper from "../Components/CardWrapper";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import "./SubBudgetScreen.css";
 
@@ -383,21 +385,55 @@ const SubBudgetScreen = () => {
 
     return (
         <Container sx={{ mt: 5 }}>
-                <Box sx={{ mb: 2 }}>
-                    <Button variant="outlined" onClick={() => navigate(-1)}>
-                        Back
-                    </Button>
-                </Box>
+            <Box sx={{ mb: 2 }}>
+                <Button
+                    variant="contained"
+                    onClick={() => navigate(-1)}
+                    startIcon={<ArrowBackIcon />}
+                    sx={{
+                        borderRadius: '3px',             // Rounded corners
+                        padding: '10px 20px',            // Increased padding
+                        fontWeight: '600',               // Bold font weight
+                        boxShadow: 3,                    // Subtle shadow for depth
+                        backgroundColor: '#e0f7fa',     // Light blue that matches the background gradient
+                        color: '#607d8b',                // Darker text for contrast (greyish-blue)
+                        '&:hover': {
+                            backgroundColor: '#b2ebf2',    // Slightly darker light blue on hover
+                            boxShadow: 6,                  // Stronger shadow on hover
+                        },
+                        '&:active': {
+                            backgroundColor: '#80deea',    // Even darker light blue when active
+                        },
+                    }}
+                >
+                    Back
+                </Button>
+
+
+
+            </Box>
 
 
             {parentData && (
                 <>
-                    <Typography variant="h5" gutterBottom>
+                    <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{
+                            fontWeight: "bold",
+                            fontSize: "1.5rem",
+                            color: "#050505",  // Vibrant Green (or any color you prefer)
+                            textTransform: "uppercase", // Makes it all uppercase
+                            letterSpacing: 1.5, // Adds spacing between the letters
+                            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
+                            background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
+                            WebkitBackgroundClip: "text",  // Clips the background to the text itself
+                        }}
+                    >
                         Subbudget for {parentData.name}
                     </Typography>
                 </>
             )}
-
             <TotalDisplay
                 boxes={boxes}
                 parentTotal={parentData ? { name: parentData.name, number: parentData.number } : parentTotal}
@@ -406,29 +442,25 @@ const SubBudgetScreen = () => {
                 onRedistribute={handleRedistribute}  // Pass the function as a prop
                 arrivalCost={totalArrivalCost}
             />
-
+    <CardWrapper >
+        <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+                fontWeight: "bold",
+                fontSize: "1.5rem",
+                color: "#050505",  // Vibrant Green (or any color you prefer)
+                textTransform: "uppercase", // Makes it all uppercase
+                letterSpacing: 1.5, // Adds spacing between the letters
+                textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
+                background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
+                WebkitBackgroundClip: "text",  // Clips the background to the text itself
+            }}
+        >
+            {parentData ? "Stops" : "Stops"}
+        </Typography>
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
-
-            <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                    mt: 4,
-                    fontWeight: "bold",
-                    fontSize: "1.5rem",
-                    color: "#050505",  // Vibrant Green (or any color you prefer)
-                    textTransform: "uppercase", // Makes it all uppercase
-                    letterSpacing: 1.5, // Adds spacing between the letters
-                    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
-                    background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
-                    WebkitBackgroundClip: "text",  // Clips the background to the text itself
-                }}
-            >
-                {parentData ? "Stops" : "Stops"}
-            </Typography>
-
-
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" , paddingTop:"20px"}}>
                 {/* First Input Field (Before First Box) */}
                 <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2,}}>
                     <ArrivalCostInput
@@ -520,24 +552,36 @@ const SubBudgetScreen = () => {
                     <Button
                         variant="contained"
                         sx={{
-                            flex: 1, // Matches DraggableBox width behavior
-                            borderRadius: 2,
-                            height: "40px", // Matches DraggableBox height
-                            padding: "20px",
-                            fontSize: "24px", // Makes the "+" more prominent
+                            flex: 1,                            // Matches DraggableBox width behavior
+                            borderRadius: 2,                    // Rounded corners for a modern look
+                            height: "40px",                     // Matches DraggableBox height
+                            padding: "10px",                    // More balanced padding for the button
+                            fontSize: "24px",                   // Makes the "+" more prominent
+                            background: "linear-gradient(45deg, #00897b, #4caf50)",  // Subtle Teal to Green gradient
+                            color: "white",                     // White text for good contrast
+                            boxShadow: 3,                       // Subtle shadow for depth
+                            '&:hover': {
+                                background: "linear-gradient(45deg, #00796b, #388e3c)",  // Slightly darker gradient on hover
+                                boxShadow: 6,                     // Stronger shadow on hover for interactive feel
+                            },
+                            '&:active': {
+                                background: "linear-gradient(45deg, #00695c, #2c6e2f)",  // Darker gradient when clicked
+                            },
                         }}
                         onClick={() => setShowAddModal(true)}
                     >
                         +
                     </Button>
+
+
                 </Box>
             </Box>
-
+    </CardWrapper>
+            <CardWrapper sx={{ paddingTop: "20px", paddingBottom:"20px" }}>
             <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
-                    mt: 4,
                     fontWeight: "bold",
                     fontSize: "1.5rem",
                     color: "#050505",  // Vibrant Green (or any color you prefer)
@@ -553,6 +597,8 @@ const SubBudgetScreen = () => {
             <div className="p-6">
                 <StatsDisplay stats={{ ...compiledRegions, "Travel Costs": totalArrivalCost }} />
             </div>
+        </CardWrapper>
+
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
                     <AddBoxForm onClose={() => setShowAddModal(false)} onSave={handleAddBox} />

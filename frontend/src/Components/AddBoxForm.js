@@ -7,7 +7,7 @@ const AddBoxForm = ({ onClose, onSave }) => {
     const [subbudgetEnabled, setSubbudgetEnabled] = useState(false);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const regionNames = ["arrival", "accommodation", "food", "transport"];
+    const regionNames = ["accommodation", "food", "transport"];
     const [regionToggles, setRegionToggles] = useState(
         Object.fromEntries(regionNames.map(region => [region, false]))
     );
@@ -34,7 +34,7 @@ const AddBoxForm = ({ onClose, onSave }) => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ p: 3, bgcolor: "white", borderRadius: 2, width: 300 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ p: 3, bgcolor: "white", borderRadius: 2, width: 500 }}>
             <Typography variant="h6" gutterBottom>
                 Add New Box
             </Typography>

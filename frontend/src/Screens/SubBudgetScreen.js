@@ -6,12 +6,20 @@ import AddBoxForm from "../Components/AddBoxForm";
 import TotalDisplay from "../Components/TotalDisplay";
 import ArrivalCostInput from "../Components/ArrivalCostInput";
 import MultiSliderBar from "../Components/MultiSliderBar";
-import DeleteIcon from '@mui/icons-material/Delete';
 import StatsDisplay from "../Components/StatsDisplay";
 
 import "./SubBudgetScreen.css";
-import {Spacer} from "@chakra-ui/react";
+
+import dayjs from "dayjs"; // Ensure you have dayjs installed: npm install dayjs
+
 const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
+    const { name, number, startDate, endDate } = box;
+
+    // Format dates compactly
+    const formatDate = (date) => (date ? dayjs(date).format("MMM D") : null);
+    const start = formatDate(startDate);
+    const end = formatDate(endDate);
+
     return (
         <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
             {/* Main Budget Box */}
@@ -26,9 +34,8 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    height: "80px", // Ensuring a consistent height
+                    height: "80px",
                     "&:hover": { backgroundColor: "#f0f0f0" },
-                    paddingBottom : "8px",
                 }}
                 draggable
                 onDragStart={(e) => onDragStart(e, box)}
@@ -36,14 +43,25 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                 onDrop={(e) => onDrop(e, box)}
                 onClick={() => onClick(box)}
             >
-                {/* Name on the left */}
-                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                    {box.name}
-                </Typography>
+                {/* Left Side: Name + Dates */}
+                <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                    {/* Name */}
+                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                        {name}
+                    </Typography>
 
-                {/* Number on the right, formatted as currency */}
+                    {/* Display Start and End Date if both exist */}
+                    {start && end && (
+                        <Typography variant="body1" sx={{ color: "gray", fontWeight: "light" }}>
+                            {start} → {end}
+                        </Typography>
+                    )}
+                </Box>
+
+
+                {/* Right Side: Number */}
                 <Typography variant="h5" sx={{ fontWeight: "bold", color: "#4CAF50" }}>
-                    ${box.number.toLocaleString()}
+                    ${number.toLocaleString()}
                 </Typography>
             </Card>
 
@@ -51,13 +69,12 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
             <Box
                 sx={{
                     ml: 1,
-                    width: "15px", // **Truly thin now!**
-                    height: "60px", // **Same height as the box**
+                    width: "15px",
+                    height: "60px",
                     borderRadius: 2,
                     backgroundColor: "#f59790",
                     cursor: "pointer",
                     "&:hover": { backgroundColor: "#d32f2f" },
-
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
@@ -349,9 +366,24 @@ const SubBudgetScreen = () => {
 
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
 
-            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                    mt: 4,
+                    fontWeight: "bold",
+                    fontSize: "1.5rem",
+                    color: "#050505",  // Vibrant Green (or any color you prefer)
+                    textTransform: "uppercase", // Makes it all uppercase
+                    letterSpacing: 1.5, // Adds spacing between the letters
+                    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
+                    background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
+                    WebkitBackgroundClip: "text",  // Clips the background to the text itself
+                }}
+            >
                 {parentData ? "Stops" : "Stops"}
             </Typography>
+
 
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                 {/* First Input Field (Before First Box) */}
@@ -411,18 +443,40 @@ const SubBudgetScreen = () => {
                         />
                     </React.Fragment>
                 ))}
-                <Box sx={{ width: "100%", borderRadius: 2, height: "50px" , padding:"20px"}}>
-                <Button
-                    variant="contained"
-                    sx={{ width: "100%", borderRadius: 2, height: "50px" , padding:"20px"}}
-                    onClick={() => setShowAddModal(true)}
-                >
-                    +
-                </Button>
+                <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 2 }}>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            flex: 1, // Matches DraggableBox width behavior
+                            borderRadius: 2,
+                            height: "40px", // Matches DraggableBox height
+                            padding: "20px",
+                            fontSize: "24px", // Makes the "+" more prominent
+                        }}
+                        onClick={() => setShowAddModal(true)}
+                    >
+                        +
+                    </Button>
                 </Box>
             </Box>
 
-            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}> Stats </Typography>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                    mt: 4,
+                    fontWeight: "bold",
+                    fontSize: "1.5rem",
+                    color: "#050505",  // Vibrant Green (or any color you prefer)
+                    textTransform: "uppercase", // Makes it all uppercase
+                    letterSpacing: 1.5, // Adds spacing between the letters
+                    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
+                    background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
+                    WebkitBackgroundClip: "text",  // Clips the background to the text itself
+                }}
+            >
+                Stats
+            </Typography>
             <div className="p-6">
                 <StatsDisplay stats={compiledRegions} />
             </div>

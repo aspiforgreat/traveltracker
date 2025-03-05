@@ -20,8 +20,25 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
     const start = formatDate(startDate);
     const end = formatDate(endDate);
 
+    // State to control animation trigger
+    const [animated, setAnimated] = useState(false);
+
+    // Trigger animation on component mount
+    useEffect(() => {
+        setAnimated(true);
+    }, []);
+
     return (
-        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+        <Box
+            sx={{
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                opacity: animated ? 1 : 0,
+                transform: animated ? "translateY(0)" : "translateY(20px)",
+                transition: "all 0.5s ease-out", // Smooth transition for opacity and position
+            }}
+        >
             {/* Main Budget Box */}
             <Card
                 elevation={3}
@@ -57,7 +74,6 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                         </Typography>
                     )}
                 </Box>
-
 
                 {/* Right Side: Number */}
                 <Typography variant="h5" sx={{ fontWeight: "bold", color: "#4CAF50" }}>
@@ -122,6 +138,16 @@ const SubBudgetScreen = () => {
         (acc, curr) => acc + curr,
         0
     );
+    const [visibleIndexes, setVisibleIndexes] = useState([]);
+
+    useEffect(() => {
+        // Add each box index to `visibleIndexes` array sequentially with a delay
+        boxes.forEach((_, index) => {
+            setTimeout(() => {
+                setVisibleIndexes((prev) => [...prev, index]);
+            }, index * 200); // Adjust 200ms for delay between items
+        });
+    }, [boxes]);
 
     useEffect(() => {
         const fetchBoxes = async () => {
@@ -419,49 +445,61 @@ const SubBudgetScreen = () => {
                     </Box>
                 </Box>
 
-                {boxes.map((box, index) => (
-                    <React.Fragment key={box._id}>
-                        {index !== 0 && (
-                            <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column",paddingTop:"10px", mb: 2 }}>
-                                {/* Light Gray Top Line */}
-                                <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+                    {boxes.map((box, index) => (
+                        <React.Fragment key={box._id}>
+                            {index !== 0 && (
+                                <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", paddingTop: "10px", mb: 2 }}>
+                                    {/* Light Gray Top Line */}
+                                    <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", mb: 1, paddingTop: "10px" }} />
 
-                                {/* Input Field */}
-                                <ArrivalCostInput
-                                    id={box._id}  // Unique identifier for each input field
-                                    previousBoxId={boxes[index-1 ]._id }  // Previous box ID
-                                    nextBoxId={box._id } // Current box ID (as next box)
-                                    tripId={trip?._id ?? null}
-                                    onChange={handleArrivalCostChange}
-                                />
-
-                                {/* Light Gray Bottom Line with Arrow */}
-                                <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
-                                    <Box
-                                        sx={{
-                                            position: "absolute",
-                                            left: "50%",
-                                            transform: "translateX(-50%)",
-                                            top: 10,
-                                            borderLeft: "6px solid transparent",
-                                            borderRight: "6px solid transparent",
-                                            borderTop: "8px solid #ccc",
-                                            paddingBottom: "8px",
-                                        }}
+                                    {/* Input Field */}
+                                    <ArrivalCostInput
+                                        id={box._id}  // Unique identifier for each input field
+                                        previousBoxId={boxes[index - 1]._id}  // Previous box ID
+                                        nextBoxId={box._id} // Current box ID (as next box)
+                                        tripId={trip?._id ?? null}
+                                        onChange={handleArrivalCostChange}
                                     />
-                                </Box>
-                            </Box>
-                        )}
 
-                        <DraggableBox
-                            box={box}
-                            onDragStart={handleDragStart}
-                            onDrop={handleDrop}
-                            onClick={handleBoxClick}
-                            onDelete={handleDeleteBox}
-                        />
-                    </React.Fragment>
-                ))}
+                                    {/* Light Gray Bottom Line with Arrow */}
+                                    <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", position: "relative", mt: 1 }}>
+                                        <Box
+                                            sx={{
+                                                position: "absolute",
+                                                left: "50%",
+                                                transform: "translateX(-50%)",
+                                                top: 10,
+                                                borderLeft: "6px solid transparent",
+                                                borderRight: "6px solid transparent",
+                                                borderTop: "8px solid #ccc",
+                                                paddingBottom: "8px",
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            )}
+
+                            <Box
+                                sx={{
+                                    opacity: visibleIndexes.includes(index) ? 1 : 0,
+                                    transform: visibleIndexes.includes(index) ? "translateY(0)" : "translateY(20px)",
+                                    transition: "all 0.5s ease-out", // Smooth transition for opacity and position
+                                    position: "relative", // Fix width and layout
+                                    width: "100%", // Fix width to prevent shifting
+                                }}
+                            >
+                                <DraggableBox
+                                    box={box}
+                                    onDragStart={handleDragStart}
+                                    onDrop={handleDrop}
+                                    onClick={handleBoxClick}
+                                    onDelete={handleDeleteBox}
+                                />
+                            </Box>
+                        </React.Fragment>
+                    ))}
+                </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2, paddingTop:"10px"}}>
                 {/* Light Gray Top Line */}

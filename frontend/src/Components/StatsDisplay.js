@@ -19,21 +19,22 @@ const StatsDisplay = ({ stats }) => {
     return (
         <div className="space-y-6">
             {/* Stacked Progress Bar */}
-            <div className="w-full h-4 rounded-full bg-gray-200 overflow-hidden  ">
-                <div className="flex h-full" >
+            <div className="w-full h-4 rounded-full bg-gray-200 overflow-hidden">
+                <div className="flex h-full">
                     {statEntries.map(([key, value], index) => {
                         const width = total > 0 ? (value / total) * 100 : 0;
                         const color = colors[index % colors.length];
                         return (
                             <div
                                 key={key}
-                                className="h-full"
+                                className="h-full transition-all duration-500 ease-in-out"
                                 style={{ width: `${width}%`, backgroundColor: color }}
                             ></div>
                         );
                     })}
                 </div>
             </div>
+
             {/* Stats List */}
             <div className="space-y-3">
                 {statEntries.map(([key, value], index) => {

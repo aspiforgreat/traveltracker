@@ -107,6 +107,21 @@ const SubBudgetScreen = () => {
     const [draggedBox, setDraggedBox] = useState(null);
     const [transferPopup, setTransferPopup] = useState(null);
     const [transferAmount, setTransferAmount] = useState("");
+    const [arrivalCostValues, setArrivalCostValues] = useState({});
+
+    // Handler to update the arrival cost for a specific box
+    const handleArrivalCostChange = (boxId, newValue) => {
+        setArrivalCostValues((prev) => ({
+            ...prev,
+            [boxId]: Number(newValue) || 0,
+        }));
+    };
+
+    // Calculate the total arrival cost
+    const totalArrivalCost = Object.values(arrivalCostValues).reduce(
+        (acc, curr) => acc + curr,
+        0
+    );
 
     useEffect(() => {
         const fetchBoxes = async () => {
@@ -318,9 +333,10 @@ const SubBudgetScreen = () => {
         const currentSum = boxes.reduce((acc, box) => acc + box.number, 0);
         if (currentSum === 0) return; // Prevent division by zero
 
+
         // Recalculate each box's number proportionally
         const redistributedBoxes = boxes.map((box) => {
-            const newNumber = Math.round((box.number / currentSum) * totalBudget);
+            const newNumber = Math.round((box.number / currentSum) * (totalBudget-totalArrivalCost));
             return { ...box, number: newNumber };
         });
         setBoxes(redistributedBoxes);
@@ -362,6 +378,7 @@ const SubBudgetScreen = () => {
                 setParentTotal={setParentTotal}
                 isHomepage={!parentData}
                 onRedistribute={handleRedistribute}  // Pass the function as a prop
+                arrivalCost={totalArrivalCost}
             />
 
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
@@ -393,6 +410,7 @@ const SubBudgetScreen = () => {
                         previousBoxId={null}  // Previous box ID
                         nextBoxId={boxes[0 ]?._id ?? null } // Current box ID (as next box)
                         tripId={trip?._id ?? null}
+                        onChange={handleArrivalCostChange}
                     />
                     {/* Downward Arrow (No Top Line) */}
                     <Box className="arrow-container"> {/* Apply the custom class here */}
@@ -413,7 +431,7 @@ const SubBudgetScreen = () => {
                                     previousBoxId={boxes[index-1 ]._id }  // Previous box ID
                                     nextBoxId={box._id } // Current box ID (as next box)
                                     tripId={trip?._id ?? null}
-
+                                    onChange={handleArrivalCostChange}
                                 />
 
                                 {/* Light Gray Bottom Line with Arrow */}
@@ -527,6 +545,7 @@ const SubBudgetScreen = () => {
                 </Box>
             </Modal>
         </Container>
+
     );
 };
 

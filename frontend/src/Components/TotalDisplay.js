@@ -7,12 +7,12 @@ const calculateTotal = (boxes) => {
     return boxes.reduce((total, box) => total + box.number, 0);
 };
 
-const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedistribute }) => {
+const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedistribute, arrivalCost }) => {
     const [userTotal, setUserTotal] = useState(parentTotal.number);  // Initialize userTotal with parent's number
     const [showModal, setShowModal] = useState(false);
 
     const totalBoxSum = calculateTotal(boxes);
-    const difference = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - totalBoxSum
+    const difference = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - (totalBoxSum+arrivalCost)
     const differenceString = Math.abs(difference) < 2 ? "" : difference >= 0 ? `+${difference}` : `${difference}`;
 
 
@@ -104,6 +104,9 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                     <Typography variant="h6" gutterBottom>Total Allocated</Typography>
                     <Box display="inline-flex" alignItems="center" gap={1}>
                         <Typography variant="h5" color="primary">{totalBoxSum}</Typography>
+                        <Typography variant="h5" color={"blue"}>
+                            {`+${arrivalCost}`}
+                        </Typography>
                         <Typography variant="h5" color={differenceColor}>
                             {differenceString}
                         </Typography>

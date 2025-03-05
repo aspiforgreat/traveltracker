@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 
-const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId }) => {
+const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange }) => {
     const [value, setValue] = useState("");
     const baseUrl = "http://localhost:8000";
 
@@ -9,24 +9,27 @@ const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId }) => {
         // Fetch initial value when the component mounts
         const fetchInitialValue = async (id) => {
             try {
-                const response = await fetch(baseUrl+ `/api/transport-cost-connections/${nextBoxId}`);
-                console.log("response", response.data)
+                const response = await fetch(`${baseUrl}/api/transport-cost-connections/${nextBoxId}`);
                 if (!response.ok) throw new Error("Failed to fetch");
                 const data = await response.json();
                 setValue(data.number);
-                return data.number; // Assuming "number" holds the arrival cost value
+                // Notify the parent of the initial value
+                if (onChange) onChange(nextBoxId, data.number);
             } catch (error) {
                 console.error("Error fetching initial value:", error);
-                return "";
             }
         };
         fetchInitialValue(nextBoxId);
     }, [nextBoxId]);
 
     useEffect(() => {
+
+    }, [onChange]);
+
+    useEffect(() => {
         const postValue = async (previousBoxId, nextBoxId, value) => {
             try {
-                const response = await fetch(baseUrl+ `/api/transport-cost-connections/${nextBoxId}`, {
+                const response = await fetch(`${baseUrl}/api/transport-cost-connections/${nextBoxId}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -39,8 +42,7 @@ const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId }) => {
 
                 if (!response.ok) throw new Error("Failed to post value");
 
-                const data = await response.json();
-                return data;
+                await response.json();
             } catch (error) {
                 console.error("Error posting value:", error);
             }
@@ -53,10 +55,13 @@ const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId }) => {
         }, 1000);
 
         return () => clearTimeout(delayDebounce);
-    }, [value]);
+    }, [value, previousBoxId, nextBoxId, tripId]);
 
     const handleChange = (e) => {
-        setValue(e.target.value);
+        const newVal = e.target.value;
+        setValue(newVal);
+        // Notify the parent of the updated value
+        if (onChange) onChange(nextBoxId, newVal);
     };
 
     return (

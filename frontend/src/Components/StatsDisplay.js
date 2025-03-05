@@ -1,35 +1,62 @@
 import React from "react";
-import * as Progress from "@radix-ui/react-progress";
 
 const StatsDisplay = ({ stats }) => {
     if (!stats) return null;
 
-    const total = Object.values(stats).reduce((a, b) => a + b, 0);
+    const statEntries = Object.entries(stats).filter(([key]) => key !== "undefined");
+    const total = statEntries.reduce((sum, [, value]) => sum + value, 0);
+
+    // Define a color palette (using hex values from Tailwind's default colors)
+    const colors = [
+        "#3B82F6", // blue-500
+        "#10B981", // green-500
+        "#EF4444", // red-500
+        "#F59E0B", // yellow-500
+        "#8B5CF6", // purple-500
+        "#EC4899"  // pink-500
+    ];
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-            {Object.entries(stats)
-                .filter(([key]) => key !== "undefined")
-                .map(([key, value]) => {
-                let name = key;
-                return (
-                    <div key={name} className="p-4 rounded-2xl shadow-md bg-white text-center">
-                        <h3 className="text-lg font-semibold capitalize">{name}</h3>
-                        <p className="text-xl font-bold text-blue-600">{value}</p>
-                        <Progress.Root
-                            className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden mt-2"
-                            style={{ transform: "translateZ(0)" }}
-                            value={(value / total) * 100}
-                        >
-                            <Progress.Indicator
-                                className="h-full bg-blue-600 transition-all duration-300"
-                                style={{ width: `${(value / total) * 100}%` }}
-                            />
-                        </Progress.Root>
-                    </div>
-                );
-            })}
+        <div className="space-y-6">
+            {/* Stacked Progress Bar */}
+            <div className="w-full h-4 rounded-full bg-gray-200 overflow-hidden  ">
+                <div className="flex h-full" >
+                    {statEntries.map(([key, value], index) => {
+                        const width = total > 0 ? (value / total) * 100 : 0;
+                        const color = colors[index % colors.length];
+                        return (
+                            <div
+                                key={key}
+                                className="h-full"
+                                style={{ width: `${width}%`, backgroundColor: color }}
+                            ></div>
+                        );
+                    })}
+                </div>
+            </div>
+            {/* Stats List */}
+            <div className="space-y-3">
+                {statEntries.map(([key, value], index) => {
+                    const color = colors[index % colors.length];
+                    return (
+                        <div key={key} className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                {/* Color indicator */}
+                                <span
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: color }}
+                                ></span>
+                                <span className="capitalize font-medium text-gray-800">{key}</span>
+                            </div>
+                            <div className="font-bold text-gray-700">{value}</div>
+                        </div>
+                    );
+                })}
+            </div>
+
+
         </div>
+
     );
 };
 

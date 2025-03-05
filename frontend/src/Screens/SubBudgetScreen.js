@@ -423,8 +423,9 @@ const SubBudgetScreen = () => {
             </Box>
 
             <Typography variant="h6" gutterBottom sx={{ mt: 4 }}> Stats </Typography>
-            <StatsDisplay stats={compiledRegions} />
-
+            <div className="p-6">
+                <StatsDisplay stats={compiledRegions} />
+            </div>
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
                     <AddBoxForm onClose={() => setShowAddModal(false)} onSave={handleAddBox} />

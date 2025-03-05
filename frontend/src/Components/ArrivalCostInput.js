@@ -72,7 +72,7 @@ const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange, plac
             size="small"
             placeholder={placeholder}
             sx={{
-                width: 150,
+                width: 200,
                 height: 20,
                 textAlign: "center",
                 backgroundColor: "white",

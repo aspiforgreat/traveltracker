@@ -42,10 +42,11 @@ router.post("/transport-cost-connections/:toBoxId", async (req, res) => {
 // Get all transport cost connections for a specific toBox
 router.get("/transport-cost-connections/:toBoxId", async (req, res) => {
     try {
-
         const toBoxId = req.params.toBoxId;
         const toBoxObjectId = new mongoose.Types.ObjectId(toBoxId);
-
+        if(!toBoxObjectId) {
+            return res.status(404).json({ error: "No connection found for the given toBox ID" });
+        }
         const connection = await TransportCostConnection.findOne({ toBox: toBoxObjectId });
 
         if (!connection) {

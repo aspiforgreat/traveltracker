@@ -130,12 +130,21 @@ const SubBudgetScreen = () => {
                 for (const box of boxes) {
                     try {
                         const regionResponse = await axios.get(`${baseUrl}/api/regions/${box._id}`);
-                        const boxRegions = regionResponse.data.regions;
+
+                        // Ensure regionResponse.data exists and contains regions
+                        if (!regionResponse.data || typeof regionResponse.data !== "object") {
+                            console.error(`Invalid response for box ${box.name}:`, regionResponse.data);
+                            continue;
+                        }
+
+                        const boxRegions = regionResponse.data || {}; // Default to empty object if undefined
                         console.log(`Fetched regions for box ${box.name}:`, boxRegions);
 
                         // Aggregate region values across all boxes
                         for (const [regionName, value] of Object.entries(boxRegions)) {
-                            aggregatedRegions[regionName] = (aggregatedRegions[regionName] || 0) + value;
+                            if (regionName && value !== undefined) { // Ensure valid region name and value
+                                aggregatedRegions[regionName] = (aggregatedRegions[regionName] || 0) + value;
+                            }
                         }
 
                         // Store each box's individual region data temporarily
@@ -153,6 +162,7 @@ const SubBudgetScreen = () => {
                 console.error("Error fetching all boxes' region data:", error);
             }
         };
+
 
         const fetchAndSumRegions = async () => {
                 await fetchAndCompileAllBoxesRegions();

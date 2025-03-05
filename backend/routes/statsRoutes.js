@@ -35,39 +35,57 @@ const calculateRegionValues = (regions, handles, number) => {
 
 // Recursive function to gather the regions for a box and its children
 const getBoxRegions = async (boxId) => {
-    // Fetch the box by its ID, populate the 'children' field with its sub-boxes
-    const box = await Box.findById(boxId)
-        .populate('children') // Ensure the children are populated
-        .exec();
+    if (!boxId) {
+        throw new Error("Invalid box ID");
+    }
 
+    // Fetch the box and populate immediate children
+    const box = await Box.findById(boxId)
+        .populate('children')
+        .exec();
+    //console.log("querying: ", box)
     if (!box) {
         throw new Error("Box not found");
     }
 
-    const regions = box.regionNames;
-    const handles = box.handles;
-    const number = box.number;
-
     // Calculate region values for the current box
-    const regionValues = calculateRegionValues(regions, handles, number);
+    const regionValues = calculateRegionValues(box.regionNames, box.handles, box.number);
 
-    // Prepare the result for the current box
     const result = {
         boxId: box._id,
         regions: regionValues
     };
 
-    // If the box has children, recursively get regions for them
+    // Use Promise.all to handle recursive calls concurrently
     if (box.children && box.children.length > 0) {
-        result.children = [];
-        for (const child of box.children) {
-            // Recursively call the function for each child
-            const childRegionData = await getBoxRegions(child._id); // Recursively process child
-            result.children.push(childRegionData);
+        result.children = await Promise.all(
+            box.children.map(child => getBoxRegions(child._id))
+        );
+       // console.log("querying child: ", box.name,"| returned this: ", result)
+    }
+    return result;
+};
+
+// Helper function to merge two region objects by summing their values
+const mergeRegionObjects = (obj1, obj2) => {
+    const merged = { ...obj1 };
+    for (const key in obj2) {
+        merged[key] = (merged[key] || 0) + obj2[key];
+    }
+    return merged;
+};
+
+// Recursively traverse the region tree and compile all region values into one aggregated object
+const gatherAllRegions = (node) => {
+    let compiled = { ...node.regions };
+
+    if (node.children && node.children.length > 0) {
+        for (const child of node.children) {
+            const childRegions = gatherAllRegions(child);
+            compiled = mergeRegionObjects(compiled, childRegions);
         }
     }
-
-    return result;
+    return compiled;
 };
 
 // GET the region data for a box and its children recursively
@@ -77,7 +95,9 @@ router.get("/regions/:boxId", async (req, res) => {
     try {
         // Call the function to get region data starting from the given boxId
         const regionData = await getBoxRegions(boxId);
-        res.json(regionData); // Send the result as JSON
+        const compiledRegions = gatherAllRegions(regionData);
+        res.json(compiledRegions); // Send the result as JSON
+        console.log(compiledRegions)
     } catch (error) {
         console.error('Error fetching region data:', error);
         res.status(500).json({ message: "Error fetching region data", error });

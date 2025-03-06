@@ -87,7 +87,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                         width: "100%",  // Full width
                         background: 'linear-gradient(135deg, #00b894, #00cec9)',
                         color: 'white',
-                        boxShadow: 5, // Shadow for the card
+                        boxShadow: "-10px 10px 10px rgba(100, 149, 237, 0.25)",
                         borderRadius: 2, // Optional: rounded corners
                     }}
                 >
@@ -117,7 +117,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                         width: "100%",  // Full width
                         background: 'linear-gradient(135deg, #f39c12, #e74c3c)',
                         color: 'white',
-                        boxShadow: 3, // Shadow for the card
+                        boxShadow: "-10px 10px 10px rgba(100, 149, 237, 0.25)",
                         borderRadius: 2, // Optional: rounded corners
                     }}
                 >

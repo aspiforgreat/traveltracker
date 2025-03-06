@@ -50,7 +50,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     padding: 2,
                     borderRadius: 2,
                     cursor: "pointer",
-                    boxShadow: "0px 7px 10px rgba(100, 149, 237, 0.25)",
+                    boxShadow: "-10px 10px 10px rgba(100, 149, 237, 0.25)",
                     backgroundColor: "#ffffff",
                     display: "flex",
                     alignItems: "center",

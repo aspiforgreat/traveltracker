@@ -8,7 +8,7 @@ const CardWrapper = ({ children, sx, cardsx = {}, ...props }) => {
             <Card
                 sx={{
                     backgroundColor: '#ffffff', // White background
-                    boxShadow: "0px 8px 24px rgba(100, 149, 237, 0.25)", // Darker blue-gray shadow
+                    boxShadow: "-12px 12px 12px rgba(0, 128, 128, 0.25)" ,// Teal shadow with some transparency
                     borderRadius: 3, // Smooth rounded corners
                     padding: 2,
                     ...cardsx // Allow custom styles to be passed

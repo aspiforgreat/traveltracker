@@ -16,7 +16,8 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
     const differenceString = Math.abs(difference) < 2 ? "" : difference >= 0 ? `+${difference}` : `${difference}`;
 
 
-    const differenceColor = difference >= 0 ? "green":"red";
+    const differenceColor = difference >= 0 ? "#b6ffa5" : "#ffffff"; // Soft light cream for positive and dark brown for negative
+
 
     const handleEditClick = () => {
         setShowModal(true);
@@ -91,11 +92,11 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                     }}
                 >
                     <CardContent>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'light' }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium' }}>
                             Budget Goal
                         </Typography>
 
-                        <Typography variant="h5" color="inherit">{parentTotal.number}</Typography>
+                        <Typography variant="h5" color="inherit"  fontWeight="bold" >{parentTotal.number}</Typography>
                     </CardContent>
                     <CardActions>
                         <Button
@@ -132,20 +133,20 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                         >
                             {/* Total Allocated Column */}
                             <Box sx={{ flex: 1, textAlign: 'left' }}>
-                                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'light'  }}>
+                                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'medium'  }}>
                                     Allocated
                                 </Typography>
-                                <Typography variant="h5" sx={{ color: 'white' }}>
+                                <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold'  }}>
                                     {totalBoxSum}
                                 </Typography>
                             </Box>
 
                             {/* Travel Costs Column */}
                             <Box sx={{ flex: 1, textAlign: 'left' }}>
-                                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'light'  }}>
+                                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'medium'  }}>
                                     Travel Costs
                                 </Typography>
-                                <Typography variant="h5" sx={{ color: 'white' }}>
+                                <Typography variant="h5" sx={{ color: 'white' ,fontWeight: 'bold' }}>
                                     {`+${arrivalCost}`}
                                 </Typography>
                             </Box>
@@ -153,7 +154,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                             {/* Difference Column */}
                             {differenceString !== "" && (
                                 <Box sx={{ flex: 1, textAlign: 'right' }}>
-                                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 'light'  }}>
+                                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold'  }}>
                                         Difference
                                     </Typography>
                                     <Typography variant="h5" color={differenceColor} >

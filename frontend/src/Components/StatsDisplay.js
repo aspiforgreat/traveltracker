@@ -19,7 +19,7 @@ const StatsDisplay = ({ stats }) => {
     return (
         <div className="space-y-6">
             {/* Stacked Progress Bar */}
-            <div className="w-full h-4 rounded-full bg-gray-200 overflow-hidden">
+            <div className="w-full h-6 rounded-full bg-gray-200 overflow-hidden">
                 <div className="flex h-full">
                     {statEntries.map(([key, value], index) => {
                         const width = total > 0 ? (value / total) * 100 : 0;
@@ -35,12 +35,16 @@ const StatsDisplay = ({ stats }) => {
                 </div>
             </div>
 
-            {/* Stats List */}
-            <div className="space-y-3">
+            {/* Stats List in Two Columns with Vertical Line Between Columns */}
+            <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                 {statEntries.map(([key, value], index) => {
                     const color = colors[index % colors.length];
                     return (
-                        <div key={key} className="flex items-center justify-between">
+                        <div
+                            key={key}
+                            className={`flex items-center justify-between ${index % 2 === 0 ? 'pr-4' : ''}`}
+                            style={index % 2 === 0 ? { borderRight: '2px solid #ddd' } : {}}
+                        >
                             <div className="flex items-center space-x-2">
                                 {/* Color indicator */}
                                 <span
@@ -54,10 +58,7 @@ const StatsDisplay = ({ stats }) => {
                     );
                 })}
             </div>
-
-
         </div>
-
     );
 };
 

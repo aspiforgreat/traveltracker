@@ -10,8 +10,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Add the gradient background */
-  background: linear-gradient(to right, #e0f7fa, #f1f3f4);  /* light blue to light grey */
+  /* Radial 3-Point Gradient Background */
+  background: radial-gradient(circle at 40% 40%, #e8f8e1 20%, #e0f7fa 50%, #f1f3f4 80%);
+  /* Light blue at top-left, super light green in the middle, grey towards edges */
 }
 
 /* Customize the code font style */

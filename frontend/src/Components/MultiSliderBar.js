@@ -10,7 +10,7 @@ const getTextColor = (bgColor) => {
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
-    return (r * 0.299 + g * 0.587 + b * 0.114) > 150 ? "#000" : "#fff"; // Adjust based on brightness
+    return (r * 0.299 + g * 0.587 + b * 0.114) > 150 ? "#444444" : "#fff"; // Adjust based on brightness
 };
 
 const MultiSliderBar = ({ boxes, onAllocationChange, onAllocationsCommit }) => {
@@ -98,13 +98,13 @@ const MultiSliderBar = ({ boxes, onAllocationChange, onAllocationsCommit }) => {
                     "& .MuiSlider-thumb": {
                         width: 16,
                         height: "100%", // Makes handles as tall as the bar
-                        backgroundColor: "#333",
+                        backgroundColor: "#f3f0f0",
                         borderRadius: "4px",
                         boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        "&:hover": { backgroundColor: "#111" },
+                        "&:hover": { backgroundColor: "#706e6e" },
                         "&::before": {
                             content: '""',
                             width: 4,

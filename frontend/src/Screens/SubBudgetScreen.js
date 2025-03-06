@@ -9,6 +9,7 @@ import MultiSliderBar from "../Components/MultiSliderBar";
 import StatsDisplay from "../Components/StatsDisplay";
 import CardWrapper from "../Components/CardWrapper";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DragHandleIcon from '@mui/icons-material/DragHandle';
 
 import "./SubBudgetScreen.css";
 
@@ -49,6 +50,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     padding: 2,
                     borderRadius: 2,
                     cursor: "pointer",
+                    boxShadow: "0px 7px 7px rgba(100, 149, 237, 0.25)",
                     backgroundColor: "#fff",
                     display: "flex",
                     alignItems: "center",
@@ -65,7 +67,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                 {/* Left Side: Name + Dates */}
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                     {/* Name */}
-                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                    <Typography variant="h5" sx={{ fontWeight: "bold", color: "#575454", textShadow: "0px 2px 2px rgba(100, 149, 237, 0.25)", }}>
                         {name}
                     </Typography>
 
@@ -77,19 +79,25 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     )}
                 </Box>
 
-                {/* Right Side: Number */}
-                <Typography variant="h5" sx={{ fontWeight: "bold", color: "#4CAF50" }}>
-                    ${number.toLocaleString()}
-                </Typography>
+                {/* Right Side: Number and Drag Handle */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    {/* Visual Drag Handle */}
+
+                    <DragHandleIcon sx={{ color: "#c5c6c7", cursor: "grab" }} />
+                    {/* Number */}
+                    <Typography variant="h5" sx={{ fontWeight: "bold", color: "#4CAF50" }}>
+                        ${number.toLocaleString()}
+                    </Typography>
+                </Box>
             </Card>
 
             {/* Thinner Delete Bar */}
             <Box
                 sx={{
                     ml: 1,
-                    width: "15px",
-                    height: "60px",
-                    borderRadius: 2,
+                    width: "14px",
+                    height: "40px",
+                    borderRadius: 10,
                     backgroundColor: "#f59790",
                     cursor: "pointer",
                     "&:hover": { backgroundColor: "#d32f2f" },
@@ -455,10 +463,10 @@ const SubBudgetScreen = () => {
             sx={{
                 fontWeight: "bold",
                 fontSize: "1.5rem",
-                color: "#050505",  // Vibrant Green (or any color you prefer)
+                color: "#464545",  // Vibrant Green (or any color you prefer)
                 textTransform: "uppercase", // Makes it all uppercase
                 letterSpacing: 1.5, // Adds spacing between the letters
-                textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
+                textShadow:"0px 7px 7px rgba(100, 149, 237, 0.25)", // Subtle shadow for emphasis
                 background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
                 WebkitBackgroundClip: "text",  // Clips the background to the text itself
             }}
@@ -596,10 +604,10 @@ const SubBudgetScreen = () => {
                 sx={{
                     fontWeight: "bold",
                     fontSize: "1.5rem",
-                    color: "#050505",  // Vibrant Green (or any color you prefer)
+                    color: "#575454",  // Vibrant Green (or any color you prefer)
                     textTransform: "uppercase", // Makes it all uppercase
                     letterSpacing: 1.5, // Adds spacing between the letters
-                    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
+                    textShadow: "2px 7px 7px rgba(100, 149, 237, 0.25)", // Subtle shadow for emphasis
                     background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
                     WebkitBackgroundClip: "text",  // Clips the background to the text itself
                 }}

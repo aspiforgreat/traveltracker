@@ -119,7 +119,7 @@ const SubBudgetScreen = () => {
     // State to store the compiled (aggregated) regions for all boxes when no parentBox exists
     const [compiledRegions, setCompiledRegions] = useState(null);
     const [connections, setConnections] = useState({});
-   const dateString = parentBox?.startDate && parentBox?.endDate ? formatDate(parentBox.startDate) + " - " +formatDate(parentBox.endDate): "";
+    const dateString = parentBox?.startDate && parentBox?.endDate ? formatDate(parentBox.startDate) + " - " +formatDate(parentBox.endDate): "";
 
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);

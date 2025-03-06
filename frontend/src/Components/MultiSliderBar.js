@@ -57,7 +57,7 @@ const MultiSliderBar = ({ boxes, onAllocationChange, onAllocationsCommit }) => {
     segments.push(100 - prevValue);
 
     return (
-        <Box sx={{ mt: 2, position: "relative", width: "100%", height: "55px", borderRadius: "12px", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+        <Box sx={{ mt: 2, position: "relative", width: "100%", height: "55px", borderRadius: "12px",boxShadow:"0 7px 7px rgba(100, 149, 237, 0.25)", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
             {/* Segments */}
             <Box sx={{ display: "flex", height: "100%" }}>
                 {segments.map((seg, index) => (
@@ -100,11 +100,11 @@ const MultiSliderBar = ({ boxes, onAllocationChange, onAllocationsCommit }) => {
                         height: "100%", // Makes handles as tall as the bar
                         backgroundColor: "#f3f0f0",
                         borderRadius: "4px",
-                        boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
+                        boxShadow: "0 3px 6px rgba(100, 149, 237, 0.25)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        "&:hover": { backgroundColor: "#706e6e" },
+                        "&:hover": { backgroundColor: "#8c8b8b" },
                         "&::before": {
                             content: '""',
                             width: 4,

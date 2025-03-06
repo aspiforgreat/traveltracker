@@ -19,7 +19,12 @@ const StatsDisplay = ({ stats }) => {
     return (
         <div className="space-y-6">
             {/* Stacked Progress Bar */}
-            <div className="w-full h-6 rounded-full bg-gray-200 overflow-hidden">
+            <div
+                className="w-full h-6 rounded-full bg-gray-200 overflow-hidden"
+                style={{
+                    boxShadow: "0px 7px 7px rgba(100, 149, 237, 0.25)", // Subtle shadow for the progress bar
+                }}
+            >
                 <div className="flex h-full">
                     {statEntries.map(([key, value], index) => {
                         const width = total > 0 ? (value / total) * 100 : 0;
@@ -28,7 +33,11 @@ const StatsDisplay = ({ stats }) => {
                             <div
                                 key={key}
                                 className="h-full transition-all duration-500 ease-in-out"
-                                style={{ width: `${width}%`, backgroundColor: color }}
+                                style={{
+                                    width: `${width}%`,
+                                    backgroundColor: color,
+                                    boxShadow: "0px 3px 6px rgba(100, 149, 237, 0.25)", // Apply shadow to each progress bar segment
+                                }}
                             ></div>
                         );
                     })}

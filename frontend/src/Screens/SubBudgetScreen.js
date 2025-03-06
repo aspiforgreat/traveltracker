@@ -14,11 +14,11 @@ import "./SubBudgetScreen.css";
 
 import dayjs from "dayjs"; // Ensure you have dayjs installed: npm install dayjs
 
+const formatDate = (date) => (date ? dayjs(date).format("MMM D") : null);
 const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
     const { name, number, startDate, endDate } = box;
 
     // Format dates compactly
-    const formatDate = (date) => (date ? dayjs(date).format("MMM D") : null);
     const start = formatDate(startDate);
     const end = formatDate(endDate);
 
@@ -119,6 +119,7 @@ const SubBudgetScreen = () => {
     // State to store the compiled (aggregated) regions for all boxes when no parentBox exists
     const [compiledRegions, setCompiledRegions] = useState(null);
     const [connections, setConnections] = useState({});
+   const dateString = parentBox?.startDate && parentBox?.endDate ? formatDate(parentBox.startDate) + " - " +formatDate(parentBox.endDate): "";
 
     const [boxes, setBoxes] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -422,16 +423,21 @@ const SubBudgetScreen = () => {
                         sx={{
                             fontWeight: "bold",
                             fontSize: "1.5rem",
-                            color: "#050505",  // Vibrant Green (or any color you prefer)
-                            textTransform: "uppercase", // Makes it all uppercase
-                            letterSpacing: 1.5, // Adds spacing between the letters
-                            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for emphasis
-                            background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
-                            WebkitBackgroundClip: "text",  // Clips the background to the text itself
+                            color: "#050505",
+                            textTransform: "uppercase",
+                            letterSpacing: 1.5,
+                            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)",
+                            background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)",
+                            WebkitBackgroundClip: "text",
+                            display: "inline-block"
                         }}
                     >
-                        Subbudget for {parentData.name}
+                        Sub-budget for {parentData.name}{" "}
+                        <span style={{ fontWeight: "300", fontSize: "1.2rem", color: "#666" }}>
+        {dateString}
+    </span>
                     </Typography>
+
                 </>
             )}
             <TotalDisplay

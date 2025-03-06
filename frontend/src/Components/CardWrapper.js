@@ -7,7 +7,7 @@ const CardWrapper = ({ children, sx, cardsx = {}, ...props }) => {
         <Box sx={{ ...sx }}>  {/* Outer padding applied here */}
             <Card
                 sx={{
-                    backgroundColor: 'white',
+                    backgroundColor: '#ffffff', // White background
                     boxShadow: "0px 8px 24px rgba(100, 149, 237, 0.25)", // Darker blue-gray shadow
                     borderRadius: 3, // Smooth rounded corners
                     padding: 2,

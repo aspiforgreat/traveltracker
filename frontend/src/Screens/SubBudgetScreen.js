@@ -50,8 +50,8 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                     padding: 2,
                     borderRadius: 2,
                     cursor: "pointer",
-                    boxShadow: "0px 7px 7px rgba(100, 149, 237, 0.25)",
-                    backgroundColor: "#fff",
+                    boxShadow: "0px 7px 10px rgba(100, 149, 237, 0.25)",
+                    backgroundColor: "#ffffff",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
@@ -67,7 +67,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
                 {/* Left Side: Name + Dates */}
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                     {/* Name */}
-                    <Typography variant="h5" sx={{ fontWeight: "bold", color: "#575454", textShadow: "0px 2px 2px rgba(100, 149, 237, 0.25)", }}>
+                    <Typography variant="h5" sx={{ fontWeight: "bold", color: "#575454" }}>
                         {name}
                     </Typography>
 
@@ -466,7 +466,6 @@ const SubBudgetScreen = () => {
                 color: "#464545",  // Vibrant Green (or any color you prefer)
                 textTransform: "uppercase", // Makes it all uppercase
                 letterSpacing: 1.5, // Adds spacing between the letters
-                textShadow:"0px 7px 7px rgba(100, 149, 237, 0.25)", // Subtle shadow for emphasis
                 background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
                 WebkitBackgroundClip: "text",  // Clips the background to the text itself
             }}
@@ -607,7 +606,7 @@ const SubBudgetScreen = () => {
                     color: "#575454",  // Vibrant Green (or any color you prefer)
                     textTransform: "uppercase", // Makes it all uppercase
                     letterSpacing: 1.5, // Adds spacing between the letters
-                    textShadow: "2px 7px 7px rgba(100, 149, 237, 0.25)", // Subtle shadow for emphasis
+                     // Subtle shadow for emphasis
                     background: "linear-gradient(90deg, rgba(76, 175, 80, 1) 0%, rgba(255, 87, 34, 1) 100%)", // Gradient background
                     WebkitBackgroundClip: "text",  // Clips the background to the text itself
                 }}

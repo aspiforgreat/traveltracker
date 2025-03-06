@@ -57,7 +57,7 @@ const MultiSliderBar = ({ boxes, onAllocationChange, onAllocationsCommit }) => {
     segments.push(100 - prevValue);
 
     return (
-        <Box sx={{ mt: 2, position: "relative", width: "100%", height: "55px", borderRadius: "12px",boxShadow:"0 7px 7px rgba(100, 149, 237, 0.25)", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+        <Box sx={{ mt: 2, position: "relative", width: "100%", height: "55px", borderRadius: "12px", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
             {/* Segments */}
             <Box sx={{ display: "flex", height: "100%" }}>
                 {segments.map((seg, index) => (

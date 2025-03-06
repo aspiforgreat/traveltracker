@@ -22,7 +22,6 @@ const StatsDisplay = ({ stats }) => {
             <div
                 className="w-full h-6 rounded-full bg-gray-200 overflow-hidden"
                 style={{
-                    boxShadow: "0px 7px 7px rgba(100, 149, 237, 0.25)", // Subtle shadow for the progress bar
                 }}
             >
                 <div className="flex h-full">

@@ -462,6 +462,8 @@ const SubBudgetScreen = () => {
             <MultiSliderBar boxes={boxes} onAllocationChange={setBoxes} onAllocationsCommit={handleSaveAllocations} />
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" , paddingTop:"20px"}}>
                 {/* First Input Field (Before First Box) */}
+                {!parentData && (
+                    <>
                 <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2,}}>
                     <ArrivalCostInput
                         id={boxes[0 ]?._id  ?? null }// Unique identifier for each input field
@@ -476,6 +478,8 @@ const SubBudgetScreen = () => {
                         <Box className="arrow-box" />
                     </Box>
                 </Box>
+                    </>
+                )}
 
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
                     {boxes.map((box, index) => (
@@ -535,8 +539,9 @@ const SubBudgetScreen = () => {
 
                 <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", mb: 2, paddingTop:"10px"}}>
                 {/* Light Gray Top Line */}
+                    {boxes.length > 0 && !parentData && (
+                        <>
                     <Box sx={{ width: 2, height: 10, backgroundColor: "#ccc", mb: 1, paddingTop:"10px" }} />
-                    {boxes.length > 0 ? (
                         <ArrivalCostInput
                             id={boxes[boxes.length - 1]._id} // Last box ID
                             previousBoxId={boxes[boxes.length - 1]._id} // Same as last box ID
@@ -545,7 +550,8 @@ const SubBudgetScreen = () => {
                             onChange={handleArrivalCostChange}
                             placeholder={"Return cost"}
                         />
-                    ) : null}
+                        </>
+                )}
                 </Box>
 
                 <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 2 }}>

@@ -5,6 +5,11 @@ import SubBudgetScreenWrapper from "./Screens/SubBudgetScreenWrapper";
 import DetailPage from "./Screens/DetailPage";
 import TripScreen from "./Screens/TripScreen";
 import LottieBackground from "./Components/LottieBackground";
+import {disableReactDevTools} from "@fvilers/disable-react-devtools";
+
+if(process.env.NODE_ENV === 'production') {
+    disableReactDevTools();
+}
 
 const App = () => (
     <>

@@ -5,7 +5,7 @@ WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 COPY frontend ./
-RUN npm run build
+RUN npm start
 
 # Stage 2: Set up Backend + MongoDB
 FROM node:16

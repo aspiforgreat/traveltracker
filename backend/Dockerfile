@@ -1,21 +1,20 @@
-# Use official Node.js image as the base image
+# Use Node.js for the backend
 FROM node:16
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and install dependencies (including nodemon)
-COPY package*.json ./
+# Copy backend files and install dependencies
+COPY backend/package.json backend/package-lock.json ./
 RUN npm install
 
-# Install nodemon globally so it's available in the container
-RUN npm install -g nodemon
+# Copy backend source code
+COPY backend ./
 
-# Copy the rest of the app's source code
-COPY . .
+# Set environment variables for MongoDB
+ENV MONGODB_URI=mongodb://mongo:27017/budgetDatabase
 
-# Expose the API port (default for Express is 3000)
+# Expose port 8000 for the backend
 EXPOSE 8000
 
-# Start the Express server with nodemon
-CMD ["nodemon", "budgetPlannerServer.js"]
+# Start the backend server
+CMD ["node", "budgetPlannerServer.js"]

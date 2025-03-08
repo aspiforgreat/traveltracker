@@ -17,7 +17,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy custom Nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY /frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built frontend from the previous stage
 COPY --from=frontend-builder /app/frontend/build /usr/share/nginx/html

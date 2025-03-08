@@ -3,7 +3,7 @@ import { TextField } from "@mui/material";
 
 const ArrivalCostInput = ({ id, previousBoxId, nextBoxId, tripId, onChange, placeholder = "Arrival cost" }) => {
     const [value, setValue] = useState("");
-    const baseUrl = "http://localhost:8000";
+    const baseUrl = "https://traveltrackerapi.onrender.com";
 
     useEffect(() => {
         // Fetch initial value when the component mounts

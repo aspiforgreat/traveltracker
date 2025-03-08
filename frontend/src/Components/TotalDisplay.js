@@ -10,7 +10,7 @@ const calculateTotal = (boxes) => {
 const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedistribute, arrivalCost }) => {
     const [userTotal, setUserTotal] = useState(parentTotal.number);  // Initialize userTotal with parent's number
     const [showModal, setShowModal] = useState(false);
-
+    const baseUrl = "https://traveltrackerapi.onrender.com";
     const totalBoxSum = calculateTotal(boxes);
     const difference = (isHomepage ? userTotal ?? 0 : parentTotal.number ?? 0) - (totalBoxSum+arrivalCost)
     const differenceString = Math.abs(difference) < 2 ? "" : difference >= 0 ? `+${difference}` : `${difference}`;
@@ -30,7 +30,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
     useEffect(() => {
         const fetchBudget = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/budget");
+                const response = await fetch(baseUrl+"/api/budget");
                 if (!response.ok) {
                     throw new Error("Error fetching budget");
                 }
@@ -47,7 +47,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
 
 
     const handleSaveUserTotal = async () => {
-        const baseUrl = "http://localhost:8000";
+
         const inputTotal = parseFloat(userTotal);
         if (!isNaN(inputTotal)) {
             // Update parent total locally

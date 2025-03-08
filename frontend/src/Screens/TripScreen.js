@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const TripScreen = () => {
+    const baseUrl = "https://traveltrackerapi.onrender.com";
     const [trips, setTrips] = useState([]);
     const navigate = useNavigate();
     const [openForm, setOpenForm] = useState(false);
@@ -31,7 +32,7 @@ const TripScreen = () => {
     useEffect(() => {
         const fetchTrips = async () => {
             try {
-                const response = await axios.get("http://localhost:8000/api/trips");
+                const response = await axios.get("https://traveltrackerapi.onrender.com/api/trips");
                 setTrips(response.data);
             } catch (error) {
                 console.error("There was an error fetching trips!", error);
@@ -54,7 +55,7 @@ const TripScreen = () => {
 
     const handleSubmit = async () => {
         try {
-            const response = await axios.post("http://localhost:8000/api/trips", newTrip);
+            const response = await axios.post(baseUrl+"/api/trips", newTrip);
             setTrips((prevTrips) => [...prevTrips, response.data]);
             setOpenForm(false);
             setNewTrip({ name: "", description: "", startDate: "", endDate: "", budget: "" });

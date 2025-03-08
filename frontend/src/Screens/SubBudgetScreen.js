@@ -112,7 +112,7 @@ const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
 };
 
 const SubBudgetScreen = () => {
-    const baseUrl = "http://localhost:8000";
+    const baseUrl = "https://traveltrackerapi.onrender.com";
     const navigate = useNavigate();
     const location = useLocation();
     const  trip = location.state?.trip;

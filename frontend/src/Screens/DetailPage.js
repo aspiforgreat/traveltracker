@@ -25,7 +25,7 @@ const DetailPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const box = location.state?.box;
-    const baseUrl = "http://localhost:8000"; // Added baseUrl for persistence
+    const baseUrl = "https://traveltrackerapi.onrender.com"; // Added baseUrl for persistence
     const maxHandles = 5;
 
     const [handles, setHandles] = useState(box?.handles || []);

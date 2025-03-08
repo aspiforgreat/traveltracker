@@ -393,7 +393,7 @@ const SubBudgetScreen = () => {
     // --- End Redistribution logic ---
 
     return (
-        <Container sx={{ mt: 5 }}>
+        <Container sx={{ mt: 2 }}>
             <Box sx={{ mb: 2 }}>
                 <Button
                     variant="contained"
@@ -576,7 +576,7 @@ const SubBudgetScreen = () => {
                             height: "40px",                     // Matches DraggableBox height
                             padding: "10px",                    // More balanced padding for the button
                             fontSize: "24px",                   // Makes the "+" more prominent
-                            background: "linear-gradient(45deg, #00897b, #4caf50)",  // Subtle Teal to Green gradient
+                            background: "linear-gradient(135deg,#00b894, #00cec9,#00b894)",  // Subtle Teal to Green gradient
                             color: "white",                     // White text for good contrast
                             boxShadow: 3,                       // Subtle shadow for depth
                             '&:hover': {

@@ -4,8 +4,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SubBudgetScreenWrapper from "./Screens/SubBudgetScreenWrapper";
 import DetailPage from "./Screens/DetailPage";
 import TripScreen from "./Screens/TripScreen";
+import LottieBackground from "./Components/LottieBackground";
 
 const App = () => (
+    <>
+        <LottieBackground/>
     <Router>
         <Routes>
             <Route path="/" element={<TripScreen/>} />
@@ -13,6 +16,7 @@ const App = () => (
             <Route path="/detail" element={<DetailPage />} />
         </Routes>
     </Router>
+    </>
 );
 
 export default App;

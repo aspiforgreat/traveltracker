@@ -115,7 +115,7 @@ const TotalDisplay = ({ boxes, parentTotal, setParentTotal, isHomepage, onRedist
                 <Card
                     sx={{
                         width: "100%",  // Full width
-                        background: 'linear-gradient(135deg, #f39c12, #e74c3c)',
+                        background: 'linear-gradient(135deg, #00b894, #00b274)',
                         color: 'white',
                         boxShadow: "-10px 10px 10px rgba(100, 149, 237, 0.25)",
                         borderRadius: 2, // Optional: rounded corners

@@ -14,7 +14,6 @@ import DragHandleIcon from '@mui/icons-material/DragHandle';
 import "./SubBudgetScreen.css";
 
 import dayjs from "dayjs";
-import DateView from "../Components/DateView"; // Ensure you have dayjs installed: npm install dayjs
 
 const formatDate = (date) => (date ? dayjs(date).format("MMM D") : null);
 const DraggableBox = ({ box, onDragStart, onDrop, onClick, onDelete }) => {
@@ -617,11 +616,6 @@ const SubBudgetScreen = () => {
             <div className="p-6">
                 <StatsDisplay stats={{ ...compiledRegions, "Travel Costs": totalArrivalCost }} />
             </div>
-        </CardWrapper>
-        <CardWrapper>
-            <DateView>
-
-            </DateView>
         </CardWrapper>
             <Modal open={showAddModal} onClose={() => setShowAddModal(false)}>
                 <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>

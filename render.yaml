@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: frontend
+    env: docker
+    docker:
+      context: .
+      dockerfilePath: frontend/Dockerfile
+    buildCommand: "npm run build"
+    startCommand: "nginx -g 'daemon off;'"
+    envVars:
+      - key: REACT_APP_API_URL
+        value: "https://travelbudgetplanner.onrender.com"
+    instanceCount: 1
+    plan: free
+    region: oregon
+
+  - type: web
+    name: backend
+    env: docker
+    docker:
+      context: .
+      dockerfilePath: backend/Dockerfile
+    buildCommand: "npm install"
+    startCommand: "node backend/budgetPlannerServer.js"
+    envVars:
+      - key: MONGODB_URI
+        value: "mongodb://mongo:27017/mydb"
+    instanceCount: 1
+    plan: free
+    region: oregon

@@ -1,0 +1,32 @@
+/* You can override default styles here */
+.calendar-container {
+    max-width: 400px;
+    margin: 50px auto;
+    font-family: Arial, sans-serif;
+}/* Remove the outline around the calendar */
+.react-calendar__tile:focus {
+    outline: none;
+}
+
+/* Optional: Remove the default border and shadow */
+.react-calendar {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+}
+
+/* Customize tiles or other elements if needed */
+.react-calendar__tile {
+    padding: 10px;
+    text-align: center;
+}
+
+.react-calendar__tile--active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.react-calendar__tile--now {
+    background-color: #FFEB3B;
+    color: black;
+}

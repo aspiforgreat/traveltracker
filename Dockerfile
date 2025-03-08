@@ -3,21 +3,26 @@ FROM node:16 as frontend-builder
 
 WORKDIR /app/frontend
 
-# Install dependencies
+# Install dependencies separately for better caching
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 
-# Copy frontend code and build the app
+# Copy frontend source code
 COPY frontend ./
+
+# Build the React app
 RUN npm run build
 
-# Stage 2: Serve React app using Nginx
+# Stage 2: Serve React App using Nginx
 FROM nginx:alpine
 
-# Copy the build files from the frontend-builder stage
+# Copy custom Nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy built frontend from the previous stage
 COPY --from=frontend-builder /app/frontend/build /usr/share/nginx/html
 
-# Expose the port Nginx will listen on
+# Expose port Nginx listens on
 EXPOSE 80
 
 # Start Nginx
